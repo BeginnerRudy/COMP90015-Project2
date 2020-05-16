@@ -1,44 +1,19 @@
-package WhiteBoardClient;
+package WhiteBoardServer;
 
-import WhiteBoardServer.SerializableBufferedImage;
+import RemoteInterface.IRemoteShape;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WhiteBoard extends JPanel implements Serializable {
+public class RemoteWhiteBoard extends JPanel {
 
-    private SerializableBufferedImage canvas;
+    private BufferedImage canvas;
 
-    public WhiteBoard(int width, int length){
-        this.canvas = new SerializableBufferedImage(width, length, SerializableBufferedImage.TYPE_INT_ARGB);
-    }
-
-
-    private void writeObject(java.io.ObjectOutputStream stream)
-            throws IOException {
-        stream.writeInt(this.canvas.getWidth());
-        stream.writeInt(this.canvas.getHeight());
-        stream.writeInt(this.canvas.getType());
-    }
-
-    private void readObject(java.io.ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        this.canvas = new SerializableBufferedImage(stream.readInt(), stream.readInt(), stream.readInt());
-    }
-
-    public void drawLine(){
-
-        Graphics2D g = (Graphics2D) this.canvas.getGraphics();
-        g.drawLine(10, 10, 1000, 1000);
-        System.out.println("client asked to draw a line");
-        this.repaint();
+    public RemoteWhiteBoard(int width, int length){
+        this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
     }
 
     public Point drawLine(Point start, Point end, Color colour, int size){
@@ -61,7 +36,7 @@ public class WhiteBoard extends JPanel implements Serializable {
         g.setStroke(new BasicStroke(weight));
 
         // Draw a line
-        synchronized (WhiteBoard.class){
+        synchronized (RemoteWhiteBoard.class){
             g.drawLine(start.x, start.y, end.x, end.y);
         }
 

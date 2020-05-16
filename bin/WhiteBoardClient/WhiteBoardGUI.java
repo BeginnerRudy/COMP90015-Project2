@@ -1,7 +1,11 @@
 package WhiteBoardClient;
 
+import RemoteInterface.IRemoteShape;
+import WhiteBoardServer.RemoteWhiteBoardShapeServant;
+
 import javax.swing.*;
 import java.awt.*;
+import java.rmi.RemoteException;
 import javax.swing.SpringLayout;
 
 public class WhiteBoardGUI extends JFrame {
@@ -12,7 +16,7 @@ public class WhiteBoardGUI extends JFrame {
     JScrollPane scroller;
 
 
-    public WhiteBoardGUI(){
+    public WhiteBoardGUI(IRemoteShape canvas) throws RemoteException {
 //        // Set the look and feel to the system style if possible.
 //        String sysFeel = UIManager.getSystemLookAndFeelClassName();
 //        String crossFeel = UIManager.getSystemLookAndFeelClassName();
@@ -39,7 +43,9 @@ public class WhiteBoardGUI extends JFrame {
         Container contentPane = this.getContentPane();
 //        contentPane.setLayout(layout);
 
-        canvas = new WhiteBoard(800, 800);
+//        canvas = new WhiteBoard(800, 800);
+        canvas.getCanvas();
+
         whiteBoardController = new WhiteBoardController(canvas);
 
 //        this.menu = new WhiteboardMenu(this);
@@ -48,11 +54,12 @@ public class WhiteBoardGUI extends JFrame {
 //        this.canvas = new WhiteboardCanvas(800, 800);
 //        this.controls = new WhiteboardControls(canvas);
 
-        this.scroller = new JScrollPane(canvas);
+        this.scroller = new JScrollPane(canvas.getCanvas());
         this.scroller.setBackground(Color.LIGHT_GRAY);
 
         // Add the canvas and controls to the main GUI. Canvas above controls.
         contentPane.add(whiteBoardController);
+        contentPane.add(scroller);
 //        this.layout.putConstraint(SpringLayout.WEST, whiteBoardController, 5,
 //                SpringLayout.WEST, contentPane);
 //        this.layout.putConstraint(SpringLayout.SOUTH, whiteBoardController, -5,
@@ -60,7 +67,6 @@ public class WhiteBoardGUI extends JFrame {
 //        this.layout.putConstraint(SpringLayout.EAST, whiteBoardController, -5,
 //                SpringLayout.EAST, contentPane);
 
-        contentPane.add(scroller);
 //        this.layout.putConstraint(SpringLayout.NORTH, scroller, 5,
 //                SpringLayout.NORTH, contentPane);
 //        this.layout.putConstraint(SpringLayout.WEST, scroller, 5,
@@ -80,45 +86,8 @@ public class WhiteBoardGUI extends JFrame {
         this.setVisible(true);
     }
 
-    public void init(){
-        setLocationRelativeTo(null);
 
-        setLayout(new GridLayout(1, 1, 0 ,0));
-
-        canvas = new WhiteBoard(800, 800);
-        whiteBoardController = new WhiteBoardController(canvas);
-
-
-        Container contentPane = this.getContentPane();// Add the canvas and controls to the main GUI. Canvas above controls.
-//        contentPane.setLayout(layout);
-        JScrollPane scroller = new JScrollPane(canvas);
-
-        contentPane.add(whiteBoardController);
-//        this.layout.putConstraint(SpringLayout.WEST, whiteBoardController, 5,
-//                SpringLayout.WEST, contentPane);
-//        this.layout.putConstraint(SpringLayout.SOUTH, whiteBoardController, -5,
-//                SpringLayout.SOUTH, contentPane);
-//        this.layout.putConstraint(SpringLayout.EAST, whiteBoardController, -5,
-//                SpringLayout.EAST, contentPane);
-
-        contentPane.add(scroller);
-//        this.layout.putConstraint(SpringLayout.NORTH, scroller, 5,
-//                SpringLayout.NORTH, contentPane);
-//        this.layout.putConstraint(SpringLayout.WEST, scroller, 5,
-//                SpringLayout.WEST, contentPane);
-//        this.layout.putConstraint(SpringLayout.SOUTH, scroller, -5,
-//                SpringLayout.NORTH, whiteBoardController);
-//        this.layout.putConstraint(SpringLayout.EAST, scroller, -5,
-//                SpringLayout.EAST, contentPane);
-//        add(s);
-
-        this.setContentPane(contentPane);
-        this.setLocationByPlatform(true);
-        setVisible(true);
-//        canvas.drawLine(new Point(10, 10), new Point(100, 5000), Color.BLACK, 1);
-    }
-
-    public static void main(String[] args) {
-        new WhiteBoardGUI();
-    }
+//    public static void main(String[] args) {
+//        new WhiteBoardGUI();
+//    }
 }

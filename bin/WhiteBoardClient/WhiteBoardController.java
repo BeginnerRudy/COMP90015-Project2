@@ -1,45 +1,59 @@
 package WhiteBoardClient;
 
+import RemoteInterface.IRemoteShape;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public class WhiteBoardController extends JPanel
         implements MouseListener,      // Listen for mouse clicks.
         MouseMotionListener, // Listen for mouse movements.
-        KeyListener
-{
-    private WhiteBoard canvas;
+        KeyListener {
+    private IRemoteShape remoteShape;
+    //    private WhiteBoard canvas
     // Points for drawing lines.
     private Point lastPoint, firstPoint;
 
-    public WhiteBoardController(WhiteBoard canvas) {
-        this.canvas = canvas;
-        canvas.addMouseListener(this);
-        canvas.addMouseMotionListener(this);
-        canvas.addKeyListener(this);
+    public WhiteBoardController(IRemoteShape remoteShape){
+        this.remoteShape = remoteShape;
+        try {
+            remoteShape.addMouseListener(this);
+//            this.addMouseMotionListener(this);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
+//        remoteShape.addMouseMotionListener(this);
+//        remoteShape.addKeyListener(this);
     }
 
-    private void drawLine(Point nextPoint){
-        if (lastPoint == null){ // there is no point, so the input is the first point of the line
+    private void drawLine(Point nextPoint) throws RemoteException {
+        if (lastPoint == null) { // there is no point, so the input is the first point of the line
             lastPoint = nextPoint;
             return;
         }
 
-        if (firstPoint == null){
+        if (firstPoint == null) {
             firstPoint = nextPoint;
         }
 
-        lastPoint = canvas.drawLine(lastPoint, nextPoint, Color.BLACK, 1);
+        remoteShape.drawLine();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        canvas.requestFocusInWindow();
-        Point newPoint = e.getPoint();
+        try {
+            remoteShape.getCanvas().requestFocusInWindow();
+            Point newPoint = e.getPoint();
 
-        drawLine(newPoint);
-//        System.out.println("clicked");
+            drawLine(newPoint);
+        System.out.println("clicked");
+        } catch (RemoteException ee) {
+            ee.printStackTrace();
+        }
     }
 
     @Override
@@ -56,13 +70,13 @@ public class WhiteBoardController extends JPanel
     @Override
     public void mouseEntered(MouseEvent e) {
 
-//        System.out.println("entered");
+        System.out.println("entered");
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
 
-//        System.out.println("exited");
+        System.out.println("exited");
     }
 
     @Override
