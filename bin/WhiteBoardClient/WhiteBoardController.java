@@ -12,21 +12,21 @@ public class WhiteBoardController extends JPanel
         implements MouseListener,      // Listen for mouse clicks.
         MouseMotionListener, // Listen for mouse movements.
         KeyListener {
-    private IRemoteShape remoteShape;
+    private WhiteBoard canvas;
     //    private WhiteBoard canvas
     // Points for drawing lines.
     private Point lastPoint, firstPoint;
 
-    public WhiteBoardController(IRemoteShape remoteShape){
-        this.remoteShape = remoteShape;
-        try {
-            remoteShape.addMouseListener(this);
-//            this.addMouseMotionListener(this);
-        }catch (RemoteException e){
-            e.printStackTrace();
-        }
+    public WhiteBoardController(WhiteBoard canvas){
+        this.canvas = canvas;
+//        try {
+//            remoteShape.addMouseListener(this);
+////            this.addMouseMotionListener(this);
+//        }catch (RemoteException e){
+//            e.printStackTrace();
+//        }
 
-//        remoteShape.addMouseMotionListener(this);
+        this.canvas.addMouseListener(this);
 //        remoteShape.addKeyListener(this);
     }
 
@@ -40,17 +40,17 @@ public class WhiteBoardController extends JPanel
             firstPoint = nextPoint;
         }
 
-        remoteShape.drawLine();
+//        remoteShape.drawLine();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         try {
-            remoteShape.getCanvas().requestFocusInWindow();
+            this.canvas.requestFocusInWindow();
             Point newPoint = e.getPoint();
 
             drawLine(newPoint);
-        System.out.println("clicked");
+            System.out.println("clicked");
         } catch (RemoteException ee) {
             ee.printStackTrace();
         }

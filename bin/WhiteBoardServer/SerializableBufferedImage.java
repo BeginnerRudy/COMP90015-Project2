@@ -1,5 +1,6 @@
 package WhiteBoardServer;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
@@ -8,10 +9,25 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Hashtable;
 
-public class SerializableBufferedImage extends BufferedImage implements Serializable{
+public class SerializableBufferedImage implements Serializable {
+    private BufferedImage canvas;
 
-    public SerializableBufferedImage(int width, int height, int imageType) {
-        super(width, height, imageType);
+    public BufferedImage getWhiteBoard(){
+        return this.canvas;
+    }
+
+    public SerializableBufferedImage(int width, int height) {
+        canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    private void writeObject(java.io.ObjectOutputStream stream)
+            throws IOException {
+        ImageIO.write(this.canvas, "png", stream);
+    }
+
+    private void readObject(java.io.ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        this.canvas = ImageIO.read(stream);
     }
 
 

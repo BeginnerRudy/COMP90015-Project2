@@ -1,6 +1,7 @@
 package WhiteBoardServer;
 
 import RemoteInterface.IRemoteShape;
+import WhiteBoardClient.IRemoteClient;
 import WhiteBoardClient.WhiteBoard;
 
 import javax.swing.*;
@@ -11,32 +12,43 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class RemoteWhiteBoardShapeServant extends UnicastRemoteObject implements IRemoteShape {
 
-    private WhiteBoard canvas;
+    private SerializableBufferedImage canvas;
+    private IRemoteClient remoteClient;
 
     protected RemoteWhiteBoardShapeServant() throws RemoteException {
         super();
-        canvas = new WhiteBoard(800, 800);
+        canvas = new SerializableBufferedImage(800, 800);
+        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(2));
+        g.drawLine(10, 10, 100, 100);
     }
 
     @Override
-    public WhiteBoard getCanvas(){
+    public SerializableBufferedImage getCanvas(){
         return this.canvas;
     }
 
-    @Override
-    public void addMouseListener(MouseListener mouseListener) throws RemoteException {
-        this.canvas.addMouseListener(mouseListener);
-    }
+//    @Override
+//    public void addMouseListener(MouseListener mouseListener) throws RemoteException {
+//        this.canvas.addMouseListener(mouseListener);
+//    }
 
     @Override
-    public boolean requestFocusInWindow() throws RemoteException {
-        return this.canvas.requestFocusInWindow();
+    public void sendRemoteClient(IRemoteClient remoteClient) throws RemoteException {
+        this.remoteClient = remoteClient;
     }
 
+//    @Override
+//    public boolean requestFocusInWindow() throws RemoteException {
+//        return this.canvas.requestFocusInWindow();
+//    }
+
     @Override
-    public void drawLine() {
-        this.canvas.drawLine();
-//        g.drawLine(10, 10, 1000, 1000);
+    public void drawLine() throws RemoteException {
+        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+        g.drawLine(10, 10, 1000, 1000);
+        remoteClient.say();
         // set default color and weight
 //        Color col = Color.BLACK;
 //        int weight = 1;

@@ -44,17 +44,17 @@ public class WhiteBoardGUI extends JFrame {
 //        contentPane.setLayout(layout);
 
 //        canvas = new WhiteBoard(800, 800);
-        canvas.getCanvas();
+//        canvas.getCanvas();
 
-        whiteBoardController = new WhiteBoardController(canvas);
 
 //        this.menu = new WhiteboardMenu(this);
 //        this.setJMenuBar(this.menu);
 
-//        this.canvas = new WhiteboardCanvas(800, 800);
+        this.canvas = new WhiteBoard(canvas.getCanvas().getWhiteBoard());
+        whiteBoardController = new WhiteBoardController(this.canvas);
 //        this.controls = new WhiteboardControls(canvas);
 
-        this.scroller = new JScrollPane(canvas.getCanvas());
+        this.scroller = new JScrollPane(this.canvas);
         this.scroller.setBackground(Color.LIGHT_GRAY);
 
         // Add the canvas and controls to the main GUI. Canvas above controls.

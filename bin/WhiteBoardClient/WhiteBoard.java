@@ -11,33 +11,44 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class WhiteBoard extends JPanel implements Serializable {
 
-    private SerializableBufferedImage canvas;
+    private BufferedImage canvas;
 
     public WhiteBoard(int width, int length){
-        this.canvas = new SerializableBufferedImage(width, length, SerializableBufferedImage.TYPE_INT_ARGB);
+        this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
+//        drawLine();
     }
 
-
-    private void writeObject(java.io.ObjectOutputStream stream)
-            throws IOException {
-        stream.writeInt(this.canvas.getWidth());
-        stream.writeInt(this.canvas.getHeight());
-        stream.writeInt(this.canvas.getType());
+    public WhiteBoard(BufferedImage canvas){
+        this.canvas = canvas;
+        this.repaint();
     }
 
-    private void readObject(java.io.ObjectInputStream stream)
-            throws IOException, ClassNotFoundException {
-        this.canvas = new SerializableBufferedImage(stream.readInt(), stream.readInt(), stream.readInt());
-    }
+//    private void writeObject(java.io.ObjectOutputStream stream)
+//            throws IOException {
+//        stream.writeInt(this.canvas.getWidth());
+//        stream.writeInt(this.canvas.getHeight());
+//        stream.writeInt(this.canvas.getType());
+//    }
+//
+//    private void readObject(java.io.ObjectInputStream stream)
+//            throws IOException, ClassNotFoundException {
+//        this.canvas = new SerializableBufferedImage(stream.readInt(), stream.readInt(), stream.readInt());
+//    }
 
     public void drawLine(){
 
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
         g.drawLine(10, 10, 1000, 1000);
         System.out.println("client asked to draw a line");
+//        try {
+//            TimeUnit.SECONDS.sleep(5);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         this.repaint();
     }
 
