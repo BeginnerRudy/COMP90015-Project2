@@ -4,22 +4,34 @@ import RemoteInterface.IRemoteWhiteBoard;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class LoginController {
-    private static LoginController loginController = new LoginController();
+public class LoginController extends UnicastRemoteObject implements IRemoteClient {
+    private static LoginController loginController;
+
+    static {
+        try {
+            loginController = new LoginController();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     private LoginFrame loginFrame;
+    private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();;
     private IRemoteWhiteBoard remoteWhiteBoard;
-    private IRemoteClient remoteClient;
+
+    protected LoginController() throws RemoteException {
+    }
 
     public static LoginController getLoginController() {
         return loginController;
     }
 
-    public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard, IRemoteClient remoteClient) {
+    public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
         this.loginFrame = loginFrame;
         this.remoteWhiteBoard = remoteWhiteBoard;
-        this.remoteClient = remoteClient;
     }
 
     public boolean join(String username) {
@@ -28,18 +40,18 @@ public class LoginController {
             // communicate with the Remote White board
 
             // if could join
-            if (this.remoteWhiteBoard.join(username, this.remoteClient)) {
-                WhiteBoardClientGUI frame = new WhiteBoardClientGUI();
+            if (this.remoteWhiteBoard.join(username, this)) {
                 // get user lists from remote
                 System.out.println(this.remoteWhiteBoard.getUserList());
+
                 // add it to the frame
                 ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
                 for (String user : users_info) {
-                    frame.listModel.addElement(user);
+                    this.whiteBoardClientGUI.listModel.addElement(user);
                 }
 
                 this.loginFrame.frame.dispose();
-                frame.frame.setVisible(true);
+                this.whiteBoardClientGUI.frame.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "The Name has already been taken!");
             }
@@ -49,5 +61,19 @@ public class LoginController {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public void say(String msg) throws RemoteException {
+
+    }
+
+    @Override
+    public void updateUserList(ArrayList<String> user_names) throws RemoteException {
+        // add it to the frame
+        ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
+        for (String user : users_info) {
+            this.whiteBoardClientGUI.listModel.addElement(user);
+        }
     }
 }

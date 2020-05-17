@@ -44,6 +44,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
             }
             // send all user in the whiteboard
+            updateUserList();
             return true;
         } else {
             // name already exits ! Failed to join.
@@ -90,6 +91,14 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             }
         }
         return users_info;
+    }
+
+    private void updateUserList() throws RemoteException{
+        ArrayList<String> users_list = new ArrayList<String>();
+        users_list.addAll(this.users.keySet());
+        for (IRemoteClient remoteClient : users.values()){
+            remoteClient.updateUserList(users_list);
+        }
     }
 
     private void broadcasting(String message) throws RemoteException{
