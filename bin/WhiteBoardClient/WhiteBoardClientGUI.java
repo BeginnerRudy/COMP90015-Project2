@@ -50,29 +50,6 @@ public class WhiteBoardClientGUI {
     BufferedImage getIma;
 
     /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LoginFrame loginFrame = new LoginFrame();
-                    loginFrame.frame.setVisible(true);
-
-//                    WhiteBoardClientGUI window = new WhiteBoardClientGUI();
-//                    window.frame.setVisible(true);
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
      * Create an empty constructor here for 'Client_Connection' to determine who is the manager and who are clients
      */
     public WhiteBoardClientGUI() {

@@ -5,6 +5,7 @@ import RemoteInterface.IRemoteShape;
 import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardServer.RemoteWhiteBoardShapeServant;
 
+import java.awt.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,8 @@ public class RemoteWhiteBoardClient {
 //            }
 
 
+
+
             Registry registry = LocateRegistry.getRegistry("localhost", 50000);
 //            IRemoteShape remoteCanvas = (IRemoteShape) registry.lookup("WhiteBoard");
             RemoteClient remoteClient = new RemoteClient();
@@ -25,10 +28,19 @@ public class RemoteWhiteBoardClient {
 //            System.out.println("6.7 - 2.3 = " + remoteCanvas.subtract(6.7, 2.3));
 //            new WhiteBoardGUI(remoteCanvas);
             IRemoteWhiteBoard remoteWhiteBoard = (IRemoteWhiteBoard) registry.lookup("WhiteBoard");
-            remoteWhiteBoard.join("user1", remoteClient);
 
-            TimeUnit.SECONDS.sleep(10);
-            remoteWhiteBoard.close("user1");
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.frame.setVisible(true);
+
+            LoginController.getLoginController().init(loginFrame, remoteWhiteBoard, remoteClient);
+
+
+
+
+//            remoteWhiteBoard.join("user1", remoteClient);
+//
+//            TimeUnit.SECONDS.sleep(10);
+//            remoteWhiteBoard.close("user1");
         } catch (Exception e) {
             e.printStackTrace();
         }

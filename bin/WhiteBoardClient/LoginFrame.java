@@ -1,5 +1,7 @@
 package WhiteBoardClient;
 
+import RemoteInterface.IRemoteWhiteBoard;
+
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,16 +25,16 @@ public class LoginFrame {
         panel.setLayout(null);
 
         // Enter dialogue textField
-        JTextField textField = new JTextField();
-        textField.setBounds(260, 450, 181, 32);
-        panel.add(textField);
-        textField.setColumns(10);
+        JTextField port = new JTextField();
+        port.setBounds(260, 450, 181, 32);
+        panel.add(port);
+        port.setColumns(10);
 
         // Enter dialogue textField
-        JTextField _textField = new JTextField();
-        _textField.setBounds(260, 497, 181, 32);
-        panel.add(_textField);
-        _textField.setColumns(10);
+        JTextField username = new JTextField();
+        username.setBounds(260, 497, 181, 32);
+        panel.add(username);
+        username.setColumns(10);
         // -----------------------------------------------------
 
         // 'send' button
@@ -43,8 +45,14 @@ public class LoginFrame {
         btnSend.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                frame.dispose();
-                new WhiteBoardClientGUI().frame.setVisible(true);
+                // communicate with the Remote White board
+
+                // if could join
+                if (LoginController.getLoginController().join(username.getText())){
+                    frame.dispose();
+                    new WhiteBoardClientGUI().frame.setVisible(true);
+                }
+
             }
         });
 

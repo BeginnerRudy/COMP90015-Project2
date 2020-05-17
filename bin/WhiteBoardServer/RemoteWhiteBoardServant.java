@@ -22,6 +22,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             // add new peer to
             users.put(username, remoteClient);
             this.broadcasting(username + " jas joined the board!", username);
+            System.out.println(username);
             try {
 
                 remoteClient.say("Joined successfully.");
