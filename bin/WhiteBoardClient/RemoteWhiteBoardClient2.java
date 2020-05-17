@@ -1,15 +1,12 @@
 package WhiteBoardClient;
 
-import RemoteInterface.IRemoteMath;
-import RemoteInterface.IRemoteShape;
 import RemoteInterface.IRemoteWhiteBoard;
-import WhiteBoardServer.RemoteWhiteBoardShapeServant;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.concurrent.TimeUnit;
 
-public class RemoteWhiteBoardClient {
+public class RemoteWhiteBoardClient2 {
     public static void main(String[] args) {
         try {
 //            if (System.getSecurityManager() == null) {
@@ -25,10 +22,10 @@ public class RemoteWhiteBoardClient {
 //            System.out.println("6.7 - 2.3 = " + remoteCanvas.subtract(6.7, 2.3));
 //            new WhiteBoardGUI(remoteCanvas);
             IRemoteWhiteBoard remoteWhiteBoard = (IRemoteWhiteBoard) registry.lookup("WhiteBoard");
-            remoteWhiteBoard.join("user1", remoteClient);
+            remoteWhiteBoard.join("user2", remoteClient);
 
-            TimeUnit.SECONDS.sleep(10);
-            remoteWhiteBoard.close("user1");
+            TimeUnit.SECONDS.sleep(3);
+            remoteWhiteBoard.quit("user2");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -21,6 +21,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         if (!this.users.containsKey(username)) {
             // add new peer to
             users.put(username, remoteClient);
+            this.broadcasting(username + " jas joined the board!", username);
             try {
 
                 remoteClient.say("Joined successfully.");
@@ -38,6 +39,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     e.printStackTrace();
                     System.out.println("==Error= promote the first user to be the manager. ");
                 }
+
             }
         } else {
             // name already exits ! Failed to join.
@@ -49,5 +51,41 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean close(String username) throws RemoteException {
+
+        // notify all the other user in the board that the board has been closed.
+        if (!username.equals(manager)){
+            users.get(username).say("You are not the manager !");
+            System.out.println(manager + username);
+            return false;
+        }
+        this.users.remove(username);
+        this.broadcasting("The white board is closed now");
+        return true;
+    }
+
+    @Override
+    public boolean quit(String username) throws RemoteException {
+        // notify all the other user in the board this user quits
+        this.users.remove(username);
+        this.broadcasting(username + "has quited the board");
+        return true;
+    }
+
+    private void broadcasting(String message) throws RemoteException{
+        for (IRemoteClient remoteClient : users.values()){
+            remoteClient.say(message);
+        }
+    }
+
+    private void broadcasting(String message, String username) throws RemoteException{
+        for (String user : users.keySet()){
+            if (user != username){
+                users.get(user).say(message);
+            }
+        }
     }
 }

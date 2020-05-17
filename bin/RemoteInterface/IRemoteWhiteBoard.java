@@ -7,8 +7,8 @@ import java.rmi.RemoteException;
 
 public interface IRemoteWhiteBoard extends Remote {
     boolean join(String username, IRemoteClient remoteClient) throws RemoteException;
-//    boolean create() throws RuntimeException;
-//    boolean close() throws RuntimeException;
-//    boolean quit() throws RuntimeException;
-//    boolean kick() throws RuntimeException;
+//    boolean create() throws RemoteException;
+    boolean close(String username) throws RemoteException;
+    boolean quit(String username) throws RemoteException;
+//    boolean kick() throws RemoteException;
 }
