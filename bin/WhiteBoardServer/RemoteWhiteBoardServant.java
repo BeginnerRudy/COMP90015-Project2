@@ -59,6 +59,10 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     }
                     // send all user in the whiteboard
                     add_user(username);
+                    // send this user the whiteboard, if there is one.
+                    if (this.canvas != null){
+                        remoteClient.createCanvas(this.canvas);
+                    }
                     return true;
                 } else {
 
@@ -136,8 +140,17 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(2));
         Random random = new Random();
-        g.drawLine(random.nextInt(500), random.nextInt(500), random.nextInt(500), random.nextInt(500));
+        g.drawLine(random.nextInt(200), random.nextInt(200), random.nextInt(200), random.nextInt(200));
+        broadcastWhiteBoard();
         return this.canvas;
+    }
+
+    private void broadcastWhiteBoard() throws RemoteException{
+        for (String username : users.keySet()) {
+            if (!username.equals(manager)){
+                this.users.get(username).createCanvas(this.canvas);
+            }
+        }
     }
 
     private void updateUserList() throws RemoteException {

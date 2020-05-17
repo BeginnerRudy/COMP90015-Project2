@@ -1,6 +1,7 @@
 package WhiteBoardClient;
 
 import RemoteInterface.IRemoteWhiteBoard;
+import WhiteBoardServer.SerializableBufferedImage;
 
 import javax.swing.*;
 import javax.swing.text.Position;
@@ -152,8 +153,6 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         try {
 
             this.whiteBoardClientGUI.createCanvas(this.remoteWhiteBoard.create().getWhiteBoard());
-            this.whiteBoardClientGUI.frame.revalidate();
-            this.whiteBoardClientGUI.frame.repaint();
         }catch (RemoteException e){
             e.printStackTrace();
         }
@@ -168,5 +167,10 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
+        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
     }
 }
