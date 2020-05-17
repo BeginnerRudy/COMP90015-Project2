@@ -15,4 +15,6 @@ public interface IRemoteClient extends Remote {
     void addUser(String username) throws RemoteException;
     void removeUser(String username) throws RemoteException;
     void setToBeManager() throws RemoteException;
+    void closeGUI() throws RemoteException;
+    void allowJoins(String username) throws RemoteException;
 }

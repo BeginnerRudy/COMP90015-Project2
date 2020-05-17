@@ -44,6 +44,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     public void close(){
         try {
             this.remoteWhiteBoard.close(this.username);
+            this.closeGUI();
         }catch (RemoteException e){
             e.printStackTrace();
         }
@@ -66,6 +67,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
                 // show manager options
                 if (isManger){
                     this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
+                    this.whiteBoardClientGUI.kickButton.setVisible(true);
                 }
 
                 // get user lists from remote
@@ -120,5 +122,39 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     @Override
     public void setToBeManager() throws RemoteException {
         this.isManger = true;
+    }
+
+    @Override
+    public void closeGUI() throws RemoteException {
+//        System.out.println("close the process");
+//        this.whiteBoardClientGUI.frame.setVisible(false);
+//        UnicastRemoteObject.unexportObject(this, true);
+//        System.exit(1);
+//        // TODO the client process should exit
+
+        System.out.println("quit");
+//        Registry registry = LocateRegistry.getRegistry();
+        try {
+//            registry.unbind(_SERVICENAME);
+            UnicastRemoteObject.unexportObject(this, false);
+        } catch (Exception e) {
+            throw new RemoteException("Could not unregister service, quiting anyway", e);
+        }
+
+        new Thread(() -> {
+            System.out.print("Shutting down...");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                // I don't care
+            }
+            System.out.println("done");
+            System.exit(0);
+        }).start();
+    }
+
+    @Override
+    public void allowJoins(String username) throws RemoteException {
+
     }
 }

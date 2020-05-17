@@ -20,6 +20,7 @@ public class WhiteBoardClientGUI {
     private JScrollPane scrollPaneForStatus;
     public JButton closeWhiteBoardButton;
     private JButton quitBoardContentButton;
+    public JButton kickButton;
     private JLabel userListTitle;
     public JList<String> userList;
     // ---------------------------------
@@ -85,20 +86,26 @@ public class WhiteBoardClientGUI {
         userListTitle.setBounds(26, 191, 219, 34);
         panel.add(userListTitle);
 
-        // 'Clear Board' button
-        quitBoardContentButton = new JButton("Quit Board");
-        quitBoardContentButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        quitBoardContentButton.setBounds(26, 100, 208, 29);
-        panel.add(quitBoardContentButton);
-
-
-
         // 'Join WhiteBoard' button
         closeWhiteBoardButton = new JButton("Close WhiteBoard");
         closeWhiteBoardButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
         closeWhiteBoardButton.setBounds(25, 56, 209, 29);
         panel.add(closeWhiteBoardButton);
         closeWhiteBoardButton.setVisible(false);
+        // 'Clear Board' button
+        quitBoardContentButton = new JButton("Quit Board");
+        quitBoardContentButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        quitBoardContentButton.setBounds(26, 100, 208, 29);
+        panel.add(quitBoardContentButton);
+
+        // 'Clear Board' button
+        kickButton = new JButton("Kick");
+        kickButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        kickButton.setBounds(26, 144, 208, 29);
+        panel.add(kickButton);
+        kickButton.setVisible(false);
+
+
 
         quitBoardContentButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -111,8 +118,8 @@ public class WhiteBoardClientGUI {
         closeWhiteBoardButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                System.out.println("User clicked on quit");
-                LoginController.getLoginController().quit();
+                System.out.println("User clicked on close");
+                LoginController.getLoginController().close();
             }
         });
     }
