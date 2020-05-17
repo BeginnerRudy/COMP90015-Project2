@@ -1,6 +1,6 @@
 package WhiteBoardClient;
 
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -11,6 +11,10 @@ import javax.swing.*;
  * @date 19/10/2019
  */
 public class WhiteBoardClientGUI {
+
+    public static void main(String[] args) {
+        new WhiteBoardClientGUI().frame.setVisible(true);
+    }
 
     // Define GUI elements
     public JFrame frame;
@@ -31,6 +35,10 @@ public class WhiteBoardClientGUI {
     public DefaultListModel<String> listModel;
     BufferedImage getIma;
 
+    WhiteBoard canvas;
+    WhiteBoardController whiteBoardController;
+    JScrollPane scroller;
+
     /**
      * Create an empty constructor here for 'Client_Connection' to determine who is the manager and who are clients
      */
@@ -46,15 +54,17 @@ public class WhiteBoardClientGUI {
 
         // Initialize the frame
         frame = new JFrame();
-        frame.setBounds(100, 100, 603, 670);
-        frame.getContentPane().setLayout(null);
+//        frame.setBounds(100, 100, 603, 670);
+
+        this.frame.setSize(828, 893);
+        frame.setLayout(new BorderLayout());
+//        frame.getContentPane().setLayout(new BorderLayout());
         frame.setTitle("Client Whiteboard ");
 
         // Initialize the panel
         panel = new JPanel();
-        panel.setBounds(0, 0, 581, 614);
-        frame.getContentPane().add(panel);
-        panel.setLayout(null);
+        panel.setBounds(0, 0, 300, 600);
+//        panel.setLayout(null);
 
         // Initialize the title of the frame
         titleOfFrame = new JLabel("Client GUI DEMO");
@@ -105,6 +115,23 @@ public class WhiteBoardClientGUI {
         panel.add(kickButton);
         kickButton.setVisible(false);
 
+        frame.getContentPane().add(panel);
+
+//        Container contentPane = this.frame.getContentPane();
+        Panel c = new Panel();
+        this.canvas = new WhiteBoard(new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB));
+        whiteBoardController = new WhiteBoardController(this.canvas);
+        this.whiteBoardController.setBounds(350, 0, 300, 600);
+
+        this.scroller = new JScrollPane(this.canvas);
+        this.scroller.setBackground(Color.LIGHT_GRAY);
+        this.scroller.setBounds(350, 0, 300, 600);
+//        contentPane.setBounds(350, 0, 300, 600);
+
+        // Add the canvas and controls to the main GUI. Canvas above controls.
+        c.add(whiteBoardController);
+        c.add(scroller);
+        this.frame.getContentPane().add(c);
 
 
         quitBoardContentButton.addMouseListener(new MouseAdapter() {

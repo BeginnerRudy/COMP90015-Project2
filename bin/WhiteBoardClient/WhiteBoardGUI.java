@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import javax.swing.SpringLayout;
 
 public class WhiteBoardGUI extends JFrame {
+
     /** The layout manager for the components. */
 //    private final SpringLayout layout;
     WhiteBoard canvas;
@@ -40,7 +41,6 @@ public class WhiteBoardGUI extends JFrame {
 //        }
 
 //        this.layout = new SpringLayout();
-        Container contentPane = this.getContentPane();
 //        contentPane.setLayout(layout);
 
 //        canvas = new WhiteBoard(800, 800);
@@ -49,10 +49,11 @@ public class WhiteBoardGUI extends JFrame {
 
 //        this.menu = new WhiteboardMenu(this);
 //        this.setJMenuBar(this.menu);
+//        this.controls = new WhiteboardControls(canvas);
 
+        Container contentPane = this.getContentPane();
         this.canvas = new WhiteBoard(canvas.getCanvas().getWhiteBoard());
         whiteBoardController = new WhiteBoardController(this.canvas);
-//        this.controls = new WhiteboardControls(canvas);
 
         this.scroller = new JScrollPane(this.canvas);
         this.scroller.setBackground(Color.LIGHT_GRAY);
