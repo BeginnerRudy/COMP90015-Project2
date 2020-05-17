@@ -14,17 +14,7 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.ListModel;
-import javax.swing.JList;
+import javax.swing.*;
 
 /**
  * @author Chaoxian Zhou, Yangyang Long, Jiuzhou Han, Wentao Yan
@@ -35,7 +25,7 @@ public class WhiteBoardClientGUI {
     // Define GUI elements
     public JFrame frame;
     private JLabel titleOfFrame;
-//    private Client client;
+    //    private Client client;
     private JPanel panel;
     private JScrollPane scrollPaneForStatus;
     private JButton joinWhiteBoardButton;
@@ -47,6 +37,7 @@ public class WhiteBoardClientGUI {
     // ---------------------------------
     private Thread uploadImg;
     private Thread downloadImg;
+    public DefaultListModel<String> listModel;
     BufferedImage getIma;
 
     /**
@@ -86,9 +77,11 @@ public class WhiteBoardClientGUI {
         panel.add(scrollPaneForStatus);
 
         // User list
-        userList = new JList();
+        listModel = new DefaultListModel();
+        userList = new JList(listModel);
         userList.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
         scrollPaneForStatus.setViewportView(userList);
+
 
         // Initialize the area to display connection status
 		/*statusArea = new JTextArea();

@@ -6,6 +6,7 @@ import WhiteBoardClient.IRemoteClient;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
@@ -42,6 +43,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 }
 
             }
+            // send all user in the whiteboard
+            return true;
         } else {
             // name already exits ! Failed to join.
             try {
@@ -74,6 +77,19 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.users.remove(username);
         this.broadcasting(username + "has quited the board");
         return true;
+    }
+
+    @Override
+    public ArrayList<String> getUserList() throws RemoteException {
+        ArrayList<String> users_info = new ArrayList<>();
+        for (String username: this.users.keySet()){
+            if (username.equals(manager)){
+                users_info.add(username + " <manager>");
+            }else{
+                users_info.add(username);
+            }
+        }
+        return users_info;
     }
 
     private void broadcasting(String message) throws RemoteException{

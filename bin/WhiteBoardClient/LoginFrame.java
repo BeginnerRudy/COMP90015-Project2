@@ -45,14 +45,7 @@ public class LoginFrame {
         btnSend.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                // communicate with the Remote White board
-
-                // if could join
-                if (LoginController.getLoginController().join(username.getText())){
-                    frame.dispose();
-                    new WhiteBoardClientGUI().frame.setVisible(true);
-                }
-
+                LoginController.getLoginController().join(username.getText());
             }
         });
 

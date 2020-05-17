@@ -8,11 +8,14 @@ import java.rmi.server.UnicastRemoteObject;
 public class RemoteClient extends UnicastRemoteObject implements IRemoteClient {
 
     protected RemoteClient() throws RemoteException {
+
+
     }
 
     @Override
     public void say(String msg) throws RemoteException {
         System.out.println(msg);
+
     }
 
 //    @Override
