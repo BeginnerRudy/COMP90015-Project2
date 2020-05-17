@@ -101,6 +101,14 @@ public class WhiteBoardClientGUI {
         clearBoardContentButton.setBounds(26, 100, 208, 29);
         panel.add(clearBoardContentButton);
 
+        clearBoardContentButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                System.out.println("User clicked on quit");
+                LoginController.getLoginController().quit();
+            }
+        });
+
 //        // 'Join WhiteBoard' button
 //        joinWhiteBoardButton = new JButton("Join WhiteBoard");
 //        joinWhiteBoardButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));

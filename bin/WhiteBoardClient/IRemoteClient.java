@@ -13,4 +13,5 @@ public interface IRemoteClient extends Remote {
     void updateUserList(ArrayList<String> user_names) throws RemoteException;
 
     void addUser(String username) throws RemoteException;
+    void removeUser(String username) throws RemoteException;
 }

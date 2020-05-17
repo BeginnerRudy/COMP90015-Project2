@@ -80,6 +80,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     public boolean quit(String username) throws RemoteException {
         // notify all the other user in the board this user quits
         this.users.remove(username);
+        this.remove_user(username);
         this.broadcasting(username + "has quited the board");
         return true;
     }
@@ -88,11 +89,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     public ArrayList<String> getUserList() throws RemoteException {
         ArrayList<String> users_info = new ArrayList<>();
         for (String username: this.users.keySet()){
-            if (username.equals(manager)){
-                users_info.add(username + " <manager>");
-            }else{
                 users_info.add(username);
-            }
         }
         return users_info;
     }
@@ -108,6 +105,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     private void add_user(String username) throws RemoteException{
         for (IRemoteClient remoteClient : users.values()){
             remoteClient.addUser(username);
+        }
+    }
+
+    private void remove_user(String username) throws RemoteException{
+        for (IRemoteClient remoteClient : users.values()){
+            remoteClient.removeUser(username);
         }
     }
 
