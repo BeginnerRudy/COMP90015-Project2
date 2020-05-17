@@ -1,19 +1,9 @@
 package WhiteBoardClient;
 
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /**
@@ -28,8 +18,8 @@ public class WhiteBoardClientGUI {
     //    private Client client;
     private JPanel panel;
     private JScrollPane scrollPaneForStatus;
-    private JButton joinWhiteBoardButton;
-    private JButton clearBoardContentButton;
+    public JButton closeWhiteBoardButton;
+    private JButton quitBoardContentButton;
     private JLabel userListTitle;
     public JList<String> userList;
     // ---------------------------------
@@ -96,12 +86,21 @@ public class WhiteBoardClientGUI {
         panel.add(userListTitle);
 
         // 'Clear Board' button
-        clearBoardContentButton = new JButton("Quit Board");
-        clearBoardContentButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        clearBoardContentButton.setBounds(26, 100, 208, 29);
-        panel.add(clearBoardContentButton);
+        quitBoardContentButton = new JButton("Quit Board");
+        quitBoardContentButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        quitBoardContentButton.setBounds(26, 100, 208, 29);
+        panel.add(quitBoardContentButton);
 
-        clearBoardContentButton.addMouseListener(new MouseAdapter() {
+
+
+        // 'Join WhiteBoard' button
+        closeWhiteBoardButton = new JButton("Close WhiteBoard");
+        closeWhiteBoardButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        closeWhiteBoardButton.setBounds(25, 56, 209, 29);
+        panel.add(closeWhiteBoardButton);
+        closeWhiteBoardButton.setVisible(false);
+
+        quitBoardContentButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("User clicked on quit");
@@ -109,10 +108,12 @@ public class WhiteBoardClientGUI {
             }
         });
 
-//        // 'Join WhiteBoard' button
-//        joinWhiteBoardButton = new JButton("Join WhiteBoard");
-//        joinWhiteBoardButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-//        joinWhiteBoardButton.setBounds(25, 56, 209, 29);
-//        panel.add(joinWhiteBoardButton);
+        closeWhiteBoardButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                System.out.println("User clicked on quit");
+                LoginController.getLoginController().quit();
+            }
+        });
     }
 }

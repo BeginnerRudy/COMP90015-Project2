@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class LoginController extends UnicastRemoteObject implements IRemoteClient {
     private static LoginController loginController;
     private String username;
+    private boolean isManger = false;
 
     static {
         try {
@@ -40,6 +41,14 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         }
     }
 
+    public void close(){
+        try {
+            this.remoteWhiteBoard.close(this.username);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+    }
+
     public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
         this.loginFrame = loginFrame;
         this.remoteWhiteBoard = remoteWhiteBoard;
@@ -53,6 +62,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             // if could join
             if (this.remoteWhiteBoard.join(username, this)) {
                 this.username = username;
+
+                // show manager options
+                if (isManger){
+                    this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
+                }
+
                 // get user lists from remote
 //                System.out.println(this.remoteWhiteBoard.getUserList());
 
@@ -100,5 +115,10 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     @Override
     public void removeUser(String username) throws RemoteException {
         this.whiteBoardClientGUI.listModel.removeElement(username);
+    }
+
+    @Override
+    public void setToBeManager() throws RemoteException {
+        this.isManger = true;
     }
 }

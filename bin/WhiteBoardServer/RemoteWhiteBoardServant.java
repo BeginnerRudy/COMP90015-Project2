@@ -40,6 +40,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 // this is the first user -> promote it to be the manager
                 manager = username;
                 try {
+                    remoteClient.setToBeManager();
                     remoteClient.say("You are the manger now");
                 } catch (RemoteException e) {
                     e.printStackTrace();
