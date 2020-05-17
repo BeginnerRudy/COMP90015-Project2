@@ -30,30 +30,34 @@ public class WhiteBoardController extends JPanel
 //        remoteShape.addKeyListener(this);
     }
 
-    private void drawLine(Point nextPoint) throws RemoteException {
-        if (lastPoint == null) { // there is no point, so the input is the first point of the line
+    private void drawLine(Point nextPoint){
+        if (lastPoint == null) {
             lastPoint = nextPoint;
             return;
         }
 
-        if (firstPoint == null) {
-            firstPoint = nextPoint;
-        }
+//        if (firstPoint == null) // Store the first point passed if none is held.
+//            firstPoint = nextPoint;
+
+//        WhiteboardMessage msg = new WhiteboardMessage(lastPoint, nextPoint,
+//                colour, lineWeight);
+        lastPoint = canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
+//        msg.addUniqueID();
+//        Client.getInstance().broadCastMessage(msg);
+//        Server.messages.put(msg.getUniqueID(), msg);
 
 //        remoteShape.drawLine();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        try {
-            this.canvas.requestFocusInWindow();
-            Point newPoint = e.getPoint();
 
-            drawLine(newPoint);
-            System.out.println("clicked");
-        } catch (RemoteException ee) {
-            ee.printStackTrace();
-        }
+        canvas.requestFocusInWindow();
+        Point newPoint = e.getPoint();
+//        lastPoint = newPoint;
+        drawLine(newPoint);
+//        lastPoint = null;
+        System.out.println("clicked !!");
     }
 
     @Override

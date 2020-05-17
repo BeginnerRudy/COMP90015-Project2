@@ -24,7 +24,6 @@ public class WhiteBoard extends JPanel implements Serializable {
 
     public WhiteBoard(BufferedImage canvas){
         this.canvas = canvas;
-        this.repaint();
     }
 
 //    private void writeObject(java.io.ObjectOutputStream stream)
@@ -49,6 +48,7 @@ public class WhiteBoard extends JPanel implements Serializable {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
+
         this.repaint();
     }
 
@@ -77,8 +77,9 @@ public class WhiteBoard extends JPanel implements Serializable {
         }
 
         // render the line
+        this.revalidate();
         this.repaint();
-
+        System.out.println("draw line");
         // return the end point
         return end;
     }
