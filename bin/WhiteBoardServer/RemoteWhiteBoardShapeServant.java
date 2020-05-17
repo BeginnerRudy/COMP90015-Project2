@@ -9,23 +9,31 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 
 public class RemoteWhiteBoardShapeServant extends UnicastRemoteObject implements IRemoteShape {
 
     private SerializableBufferedImage canvas;
     private IRemoteClient remoteClient;
 
+
     protected RemoteWhiteBoardShapeServant() throws RemoteException {
         super();
         canvas = new SerializableBufferedImage(800, 800);
-        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(2));
-        g.drawLine(10, 10, 100, 100);
+//        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+//        g.setColor(Color.BLACK);
+//        g.setStroke(new BasicStroke(2));
+//        g.drawLine(10, 10, 100, 100);
     }
 
     @Override
     public SerializableBufferedImage getCanvas(){
+
+        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(2));
+        Random random = new Random();
+        g.drawLine(random.nextInt(500), random.nextInt(500), random.nextInt(500), random.nextInt(500));
         return this.canvas;
     }
 
@@ -48,7 +56,7 @@ public class RemoteWhiteBoardShapeServant extends UnicastRemoteObject implements
     public void drawLine() throws RemoteException {
         Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
         g.drawLine(10, 10, 1000, 1000);
-        remoteClient.say();
+//        remoteClient.say(this.canvas);
         // set default color and weight
 //        Color col = Color.BLACK;
 //        int weight = 1;
