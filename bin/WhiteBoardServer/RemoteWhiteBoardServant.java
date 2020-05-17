@@ -20,6 +20,10 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     public boolean join(String username, IRemoteClient remoteClient) throws RemoteException{
         // check if the name has been taken
         if (!this.users.containsKey(username)) {
+
+            ArrayList<String> users_list = new ArrayList<String>();
+            users_list.addAll(this.users.keySet());
+            remoteClient.updateUserList(users_list);
             // add new peer to
             users.put(username, remoteClient);
             this.broadcasting(username + " jas joined the board!", username);
@@ -44,7 +48,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
             }
             // send all user in the whiteboard
-            updateUserList();
+            add_user(username);
             return true;
         } else {
             // name already exits ! Failed to join.
@@ -98,6 +102,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         users_list.addAll(this.users.keySet());
         for (IRemoteClient remoteClient : users.values()){
             remoteClient.updateUserList(users_list);
+        }
+    }
+
+    private void add_user(String username) throws RemoteException{
+        for (IRemoteClient remoteClient : users.values()){
+            remoteClient.addUser(username);
         }
     }
 

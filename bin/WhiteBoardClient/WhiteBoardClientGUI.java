@@ -31,7 +31,7 @@ public class WhiteBoardClientGUI {
     private JButton joinWhiteBoardButton;
     private JButton clearBoardContentButton;
     private JLabel userListTitle;
-    private JList<String> userList;
+    public JList<String> userList;
     // ---------------------------------
     private JTextPane chatPane;
     // ---------------------------------

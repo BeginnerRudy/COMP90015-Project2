@@ -3,6 +3,7 @@ package WhiteBoardClient;
 import RemoteInterface.IRemoteWhiteBoard;
 
 import javax.swing.*;
+import javax.swing.text.Position;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     }
 
     private LoginFrame loginFrame;
-    private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();;
+    private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
+    ;
     private IRemoteWhiteBoard remoteWhiteBoard;
 
     protected LoginController() throws RemoteException {
@@ -42,13 +44,13 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             // if could join
             if (this.remoteWhiteBoard.join(username, this)) {
                 // get user lists from remote
-                System.out.println(this.remoteWhiteBoard.getUserList());
+//                System.out.println(this.remoteWhiteBoard.getUserList());
 
                 // add it to the frame
-                ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
-                for (String user : users_info) {
-                    this.whiteBoardClientGUI.listModel.addElement(user);
-                }
+//                ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
+//                for (String user : users_info) {
+//                    this.whiteBoardClientGUI.listModel.addElement(user);
+//                }
 
                 this.loginFrame.frame.dispose();
                 this.whiteBoardClientGUI.frame.setVisible(true);
@@ -73,7 +75,15 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         // add it to the frame
         ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
         for (String user : users_info) {
-            this.whiteBoardClientGUI.listModel.addElement(user);
+//            int index = this.whiteBoardClientGUI.userList.getNextMatch(user, 0, Position.Bias.Forward);
+//            if (index == -1) {
+                this.whiteBoardClientGUI.listModel.addElement(user);
+//            }
         }
+    }
+
+    @Override
+    public void addUser(String username) throws RemoteException {
+        this.whiteBoardClientGUI.listModel.addElement(username);
     }
 }
