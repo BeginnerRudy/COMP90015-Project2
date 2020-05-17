@@ -149,9 +149,14 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     }
 
     public void createWhiteBoard(){
-        this.whiteBoardClientGUI.createCanvas(new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB));
-        this.whiteBoardClientGUI.frame.revalidate();
-        this.whiteBoardClientGUI.frame.repaint();
+        try {
+
+            this.whiteBoardClientGUI.createCanvas(this.remoteWhiteBoard.create().getWhiteBoard());
+            this.whiteBoardClientGUI.frame.revalidate();
+            this.whiteBoardClientGUI.frame.repaint();
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
