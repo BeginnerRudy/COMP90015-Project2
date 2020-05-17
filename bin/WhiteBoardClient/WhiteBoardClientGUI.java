@@ -122,5 +122,14 @@ public class WhiteBoardClientGUI {
                 LoginController.getLoginController().close();
             }
         });
+
+        kickButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                System.out.println("kick");
+                String username = (String) userList.getSelectedValue();
+                LoginController.getLoginController().kick(username);
+            }
+        });
     }
 }

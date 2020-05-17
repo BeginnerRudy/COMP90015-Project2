@@ -21,23 +21,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         // check if the name has been taken
         if (!this.users.containsKey(username)) {
 
-            ArrayList<String> users_list = new ArrayList<String>();
-            users_list.addAll(this.users.keySet());
-            remoteClient.updateUserList(users_list);
-            // add new peer to
-            users.put(username, remoteClient);
-            this.broadcasting(username + " jas joined the board!", username);
-            System.out.println(username);
-            try {
-
-                remoteClient.say("Joined successfully.");
-            }catch (RemoteException e){
-                e.printStackTrace();
-            }
 
             // check if it is the first user
             if (manager == null) {
                 // this is the first user -> promote it to be the manager
+                users.put(username, remoteClient);
                 manager = username;
                 try {
                     remoteClient.setToBeManager();
@@ -47,10 +35,42 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     System.out.println("==Error= promote the first user to be the manager. ");
                 }
 
+                // send all user in the whiteboard
+                add_user(username);
+                return true;
+
+            }else{
+                // ask whether the manager allow this new user to join
+                if (this.users.get(manager).allowJoins(username)){
+                    ArrayList<String> users_list = new ArrayList<String>();
+                    users_list.addAll(this.users.keySet());
+                    remoteClient.updateUserList(users_list);
+                    // add new peer to
+                    users.put(username, remoteClient);
+                    this.broadcasting(username + " jas joined the board!", username);
+                    System.out.println(username);
+                    try {
+
+                        remoteClient.say("Joined successfully.");
+                    }catch (RemoteException e){
+                        e.printStackTrace();
+                    }
+                    // send all user in the whiteboard
+                    add_user(username);
+                    return true;
+                }else {
+
+                    // name already exits ! Failed to join.
+                    try {
+                        remoteClient.say("You are not allowed to join.");
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                        System.out.println("==Error= name collision, failed to join");
+                    }
+                    return false;
+                }
+
             }
-            // send all user in the whiteboard
-            add_user(username);
-            return true;
         } else {
             // name already exits ! Failed to join.
             try {
@@ -59,8 +79,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 e.printStackTrace();
                 System.out.println("==Error= name collision, failed to join");
             }
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -75,6 +95,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.users.remove(username);
         this.broadcasting("The white board is closed now");
         this.closeGUI();
+        this.manager = null; // reset the manager
+        this.users.clear();
         return true;
     }
 
@@ -94,6 +116,15 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 users_info.add(username);
         }
         return users_info;
+    }
+
+    @Override
+    public boolean kick(String username) throws RemoteException {
+        this.users.get(username).say("you have been kicked");
+        this.users.get(username).closeGUI();
+        this.users.remove(username);
+        remove_user(username);
+        return true;
     }
 
     private void updateUserList() throws RemoteException{

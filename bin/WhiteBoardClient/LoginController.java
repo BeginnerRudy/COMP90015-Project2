@@ -33,19 +33,28 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         return loginController;
     }
 
-    public void quit() {
+    public void kick(String username) {
         try {
-            this.remoteWhiteBoard.quit(this.username);
+
+            this.remoteWhiteBoard.kick(username);
         }catch (RemoteException e){
             e.printStackTrace();
         }
     }
 
-    public void close(){
+    public void quit() {
+        try {
+            this.remoteWhiteBoard.quit(this.username);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void close() {
         try {
             this.remoteWhiteBoard.close(this.username);
             this.closeGUI();
-        }catch (RemoteException e){
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -65,7 +74,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
                 this.username = username;
 
                 // show manager options
-                if (isManger){
+                if (isManger) {
                     this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
                     this.whiteBoardClientGUI.kickButton.setVisible(true);
                 }
@@ -81,9 +90,11 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
                 this.loginFrame.frame.dispose();
                 this.whiteBoardClientGUI.frame.setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(null, "The Name has already been taken!");
             }
+
+//            else {
+//                JOptionPane.showMessageDialog(null, "The Name has already been taken!");
+//            }
 
             return true;
         } catch (RemoteException e) {
@@ -94,6 +105,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
     @Override
     public void say(String msg) throws RemoteException {
+        System.out.println(msg);
 
     }
 
@@ -126,35 +138,22 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
     @Override
     public void closeGUI() throws RemoteException {
-//        System.out.println("close the process");
-//        this.whiteBoardClientGUI.frame.setVisible(false);
-//        UnicastRemoteObject.unexportObject(this, true);
-//        System.exit(1);
-//        // TODO the client process should exit
-
-        System.out.println("quit");
-//        Registry registry = LocateRegistry.getRegistry();
-        try {
-//            registry.unbind(_SERVICENAME);
-            UnicastRemoteObject.unexportObject(this, false);
-        } catch (Exception e) {
-            throw new RemoteException("Could not unregister service, quiting anyway", e);
-        }
 
         new Thread(() -> {
             System.out.print("Shutting down...");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // I don't care
-            }
             System.out.println("done");
             System.exit(0);
         }).start();
     }
 
     @Override
-    public void allowJoins(String username) throws RemoteException {
-
+    public boolean allowJoins(String username) throws RemoteException {
+        int result = JOptionPane.showConfirmDialog(this.whiteBoardClientGUI.frame, username, "New user join request",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            return true;
+        }
+        return false;
     }
 }
