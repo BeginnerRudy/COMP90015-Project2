@@ -38,6 +38,7 @@ public class WhiteBoardClientGUI {
     WhiteBoard canvas;
     WhiteBoardController whiteBoardController;
     JScrollPane scroller;
+    JButton createBtn;
 
     /**
      * Create an empty constructor here for 'Client_Connection' to determine who is the manager and who are clients
@@ -115,23 +116,15 @@ public class WhiteBoardClientGUI {
         panel.add(kickButton);
         kickButton.setVisible(false);
 
-        frame.getContentPane().add(panel);
+        // 'Clear Board' button
+        createBtn = new JButton("Create");
+        createBtn.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        createBtn.setBounds(26, 188, 208, 29);
+        panel.add(createBtn);
+        createBtn.setVisible(false);
 
-//        Container contentPane = this.frame.getContentPane();
-        Panel c = new Panel();
-        this.canvas = new WhiteBoard(new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB));
-        whiteBoardController = new WhiteBoardController(this.canvas);
-        this.whiteBoardController.setBounds(350, 0, 300, 600);
+        frame.getContentPane().add(panel, BorderLayout.EAST);
 
-        this.scroller = new JScrollPane(this.canvas);
-        this.scroller.setBackground(Color.LIGHT_GRAY);
-        this.scroller.setBounds(350, 0, 300, 600);
-//        contentPane.setBounds(350, 0, 300, 600);
-
-        // Add the canvas and controls to the main GUI. Canvas above controls.
-        c.add(whiteBoardController);
-        c.add(scroller);
-        this.frame.getContentPane().add(c);
 
 
         quitBoardContentButton.addMouseListener(new MouseAdapter() {
@@ -158,5 +151,38 @@ public class WhiteBoardClientGUI {
                 LoginController.getLoginController().kick(username);
             }
         });
+
+        createBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                System.out.println("create white board");
+//                String username = (String) userList.getSelectedValue();
+                LoginController.getLoginController().createWhiteBoard();
+            }
+        });
+    }
+
+    public void createCanvas(BufferedImage canvas){
+        //        Container contentPane = this.frame.getContentPane();
+        Panel c = new Panel();
+        this.canvas = new WhiteBoard(canvas);
+        whiteBoardController = new WhiteBoardController(this.canvas);
+        this.whiteBoardController.setBounds(350, 0, 300, 600);
+
+        this.scroller = new JScrollPane(this.canvas);
+        this.scroller.setBackground(Color.LIGHT_GRAY);
+        this.scroller.setBounds(350, 0, 300, 600);
+//        contentPane.setBounds(350, 0, 300, 600);
+
+        // Add the canvas and controls to the main GUI. Canvas above controls.
+        c.add(whiteBoardController);
+        c.add(scroller);
+        this.frame.getContentPane().add(c, BorderLayout.SOUTH);
+//        c.revalidate();
+//        c.repaint();
+        this.frame.getContentPane().revalidate();
+        this.frame.getContentPane().repaint();
+//        this.frame.revalidate();
+//        this.frame.repaint();
     }
 }

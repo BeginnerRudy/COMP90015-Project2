@@ -4,6 +4,7 @@ import RemoteInterface.IRemoteWhiteBoard;
 
 import javax.swing.*;
 import javax.swing.text.Position;
+import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
                 if (isManger) {
                     this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
                     this.whiteBoardClientGUI.kickButton.setVisible(true);
+                    this.whiteBoardClientGUI.createBtn.setVisible(true);
                 }
 
                 // get user lists from remote
@@ -144,6 +146,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             System.out.println("done");
             System.exit(0);
         }).start();
+    }
+
+    public void createWhiteBoard(){
+        this.whiteBoardClientGUI.createCanvas(new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB));
+        this.whiteBoardClientGUI.frame.revalidate();
+        this.whiteBoardClientGUI.frame.repaint();
     }
 
     @Override
