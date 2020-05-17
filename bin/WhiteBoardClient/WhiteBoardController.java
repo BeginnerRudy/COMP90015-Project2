@@ -1,6 +1,8 @@
 package WhiteBoardClient;
 
 import RemoteInterface.IRemoteShape;
+import RemoteInterface.IRemoteWhiteBoard;
+import WhiteBoardServer.RemoteWhiteBoard;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,12 +15,16 @@ public class WhiteBoardController extends JPanel
         MouseMotionListener, // Listen for mouse movements.
         KeyListener {
     private WhiteBoard canvas;
+    private IRemoteWhiteBoard remoteWhiteBoard;
     //    private WhiteBoard canvas
     // Points for drawing lines.
     private Point lastPoint, firstPoint;
+    private String username;
 
-    public WhiteBoardController(WhiteBoard canvas){
+    public WhiteBoardController(WhiteBoard canvas, IRemoteWhiteBoard remoteWhiteBoard, String username){
         this.canvas = canvas;
+        this.remoteWhiteBoard = remoteWhiteBoard;
+        this.username = username;
 //        try {
 //            remoteShape.addMouseListener(this);
 ////            this.addMouseMotionListener(this);
@@ -41,11 +47,16 @@ public class WhiteBoardController extends JPanel
 
 //        WhiteboardMessage msg = new WhiteboardMessage(lastPoint, nextPoint,
 //                colour, lineWeight);
+        try{
+            remoteWhiteBoard.drawLine(this.username, new MyPoint(lastPoint.x, lastPoint.y), new MyPoint(nextPoint.x, nextPoint.y));
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
         lastPoint = canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
+
 //        msg.addUniqueID();
 //        Client.getInstance().broadCastMessage(msg);
 //        Server.messages.put(msg.getUniqueID(), msg);
-
 //        remoteShape.drawLine();
     }
 

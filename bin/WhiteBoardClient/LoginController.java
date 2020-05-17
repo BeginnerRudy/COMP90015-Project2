@@ -5,6 +5,7 @@ import WhiteBoardServer.SerializableBufferedImage;
 
 import javax.swing.*;
 import javax.swing.text.Position;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -151,8 +152,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
     public void createWhiteBoard(){
         try {
-
-            this.whiteBoardClientGUI.createCanvas(this.remoteWhiteBoard.create().getWhiteBoard());
+            this.whiteBoardClientGUI.createCanvas(this.remoteWhiteBoard.create().getWhiteBoard(), remoteWhiteBoard, this.username);
         }catch (RemoteException e){
             e.printStackTrace();
         }
@@ -171,6 +171,13 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
-        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
+        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+    }
+
+    @Override
+    public void drawLine(MyPoint start, MyPoint end) throws RemoteException {
+//        this.whiteBoardClientGUI.canvas.requestFocusInWindow();
+        this.whiteBoardClientGUI.canvas.drawLine(new Point(start.x, start.y), new Point(end.x, end.y), Color.orange, 1);
+//        canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
     }
 }

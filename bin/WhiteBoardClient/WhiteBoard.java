@@ -53,6 +53,7 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     public Point drawLine(Point start, Point end, Color colour, int size){
+        this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
 
         // set default color and weight

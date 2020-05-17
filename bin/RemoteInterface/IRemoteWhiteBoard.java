@@ -1,6 +1,7 @@
 package RemoteInterface;
 
 import WhiteBoardClient.IRemoteClient;
+import WhiteBoardClient.MyPoint;
 import WhiteBoardServer.SerializableBufferedImage;
 
 import java.rmi.Remote;
@@ -20,4 +21,6 @@ public interface IRemoteWhiteBoard extends Remote {
     boolean kick(String username) throws RemoteException;
 
     SerializableBufferedImage create() throws RemoteException;
+
+    void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException;
 }

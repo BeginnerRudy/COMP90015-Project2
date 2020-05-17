@@ -2,6 +2,7 @@ package WhiteBoardServer;
 
 import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardClient.IRemoteClient;
+import WhiteBoardClient.MyPoint;
 
 import java.awt.*;
 import java.rmi.RemoteException;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
+        public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
     private HashMap<String, IRemoteClient> users = new HashMap<>();
     private String manager;
     private SerializableBufferedImage canvas;
@@ -145,6 +146,19 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return this.canvas;
     }
 
+    @Override
+    public void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException {
+        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+        g.setColor(Color.orange);
+        g.setStroke(new BasicStroke(1));
+        g.drawLine(start.x, start.y, end.x, end.y);
+        for (String user : users.keySet()) {
+            if (!user.equals(username)){
+                this.users.get(user).drawLine(start, end);
+            }
+        }
+    }
+
     private void broadcastWhiteBoard() throws RemoteException{
         for (String username : users.keySet()) {
             if (!username.equals(manager)){
@@ -178,6 +192,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         for (IRemoteClient remoteClient : users.values()) {
             remoteClient.closeGUI();
         }
+        this.canvas = null;
     }
 
     private void broadcasting(String message) throws RemoteException {

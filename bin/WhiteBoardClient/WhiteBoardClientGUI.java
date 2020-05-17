@@ -1,5 +1,7 @@
 package WhiteBoardClient;
 
+import RemoteInterface.IRemoteWhiteBoard;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -35,7 +37,7 @@ public class WhiteBoardClientGUI {
     public DefaultListModel<String> listModel;
     BufferedImage getIma;
 
-    WhiteBoard canvas;
+    public WhiteBoard canvas;
     WhiteBoardController whiteBoardController;
     JScrollPane scroller;
     JButton createBtn;
@@ -162,11 +164,11 @@ public class WhiteBoardClientGUI {
         });
     }
 
-    public void createCanvas(BufferedImage canvas){
+    public void createCanvas(BufferedImage canvas, IRemoteWhiteBoard remoteWhiteBoard, String username){
         //        Container contentPane = this.frame.getContentPane();
         Panel c = new Panel();
         this.canvas = new WhiteBoard(canvas);
-        whiteBoardController = new WhiteBoardController(this.canvas);
+        whiteBoardController = new WhiteBoardController(this.canvas, remoteWhiteBoard, username);
         this.whiteBoardController.setBounds(350, 0, 300, 600);
 
         this.scroller = new JScrollPane(this.canvas);
