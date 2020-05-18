@@ -232,8 +232,8 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
     @Override
     public void drawLine(MyPoint start, MyPoint end) throws RemoteException {
-//        this.whiteBoardClientGUI.canvas.requestFocusInWindow();
-//        this.whiteBoardClientGUI.canvas.drawLine(start, end, Color.orange, 1);
+        this.whiteBoardClientGUI.canvas.requestFocusInWindow();
+        this.whiteBoardClientGUI.canvas.drawLine(start, end, Color.BLACK, 1);
 //        canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
     }
 
@@ -260,6 +260,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     @Override
     public void mouseReleased(MouseEvent e) {
 //        System.out.println("released");
+        try {
+
+            this.remoteWhiteBoard.drawLine(this.username, lastPoint, firstPoint);
+        } catch (RemoteException ee) {
+            ee.printStackTrace();
+        }
         this.whiteBoardClientGUI.canvas.fixed = true;
         this.whiteBoardClientGUI.canvas.repaint();
 
