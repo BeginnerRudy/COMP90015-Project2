@@ -1,5 +1,6 @@
 package WhiteBoardClient;
 
+import java.awt.*;
 import java.io.Serializable;
 
 public class MyPoint implements Serializable {
@@ -10,5 +11,10 @@ public class MyPoint implements Serializable {
     public MyPoint(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public MyPoint(Point point){
+        this.x = point.x;
+        this.y = point.y;
     }
 }

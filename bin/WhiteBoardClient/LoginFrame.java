@@ -42,6 +42,7 @@ public class LoginFrame {
         btnSend.setBounds(446, 496, 69, 33);
         panel.add(btnSend);
 
+
         btnSend.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {

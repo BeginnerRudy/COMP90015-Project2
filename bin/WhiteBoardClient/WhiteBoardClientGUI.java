@@ -44,7 +44,7 @@ public class WhiteBoardClientGUI {
     BufferedImage getIma;
 
     public WhiteBoard canvas;
-    WhiteBoardController whiteBoardController;
+//    WhiteBoardController whiteBoardController;
     JScrollPane scroller;
     JButton createBtn;
 
@@ -65,17 +65,14 @@ public class WhiteBoardClientGUI {
 
         // Initialize the frame
         frame = new JFrame();
-//        frame.setBounds(100, 100, 603, 670);
 
-        this.frame.setSize(828, 893);
+        this.frame.setSize(1400, 1400);
         frame.setLayout(new BorderLayout());
-//        frame.getContentPane().setLayout(new BorderLayout());
         frame.setTitle("Client Whiteboard ");
 
         // Initialize the panel
         panel = new JPanel();
         panel.setBounds(0, 0, 300, 600);
-//        panel.setLayout(null);
 
         // Initialize the title of the frame
         titleOfFrame = new JLabel("Client GUI DEMO");
@@ -94,13 +91,6 @@ public class WhiteBoardClientGUI {
         userList.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
         scrollPaneForStatus.setViewportView(userList);
 
-
-        // Initialize the area to display connection status
-		/*statusArea = new JTextArea();
-		statusArea.setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
-		statusArea.setText("");
-		statusArea.setEditable(false);
-		scrollPaneForStatus.setViewportView(statusArea);*/
 
         userListTitle = new JLabel("User List");
         userListTitle.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
@@ -202,7 +192,9 @@ public class WhiteBoardClientGUI {
         // add menubar to frame
         frame.setJMenuBar(mb);
         mb.setVisible(false);
-        frame.getContentPane().add(panel, BorderLayout.EAST);
+
+
+        frame.getContentPane().add(panel, BorderLayout.NORTH);
 
 
         quitBoardContentButton.addMouseListener(new MouseAdapter() {
@@ -234,7 +226,6 @@ public class WhiteBoardClientGUI {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("create white board");
-//                String username = (String) userList.getSelectedValue();
                 LoginController.getLoginController().createWhiteBoard();
             }
         });
@@ -242,25 +233,21 @@ public class WhiteBoardClientGUI {
 
     public void createCanvas(BufferedImage canvas, IRemoteWhiteBoard remoteWhiteBoard, String username) {
         //        Container contentPane = this.frame.getContentPane();
-        Panel c = new Panel();
+        JPanel c = new JPanel();
+
         this.canvas = new WhiteBoard(canvas);
-        whiteBoardController = new WhiteBoardController(this.canvas, remoteWhiteBoard, username);
-        this.whiteBoardController.setBounds(350, 0, 300, 600);
+//        whiteBoardController = new WhiteBoardController(this.canvas, remoteWhiteBoard, username);
 
         this.scroller = new JScrollPane(this.canvas);
         this.scroller.setBackground(Color.LIGHT_GRAY);
-        this.scroller.setBounds(350, 0, 300, 600);
-//        contentPane.setBounds(350, 0, 300, 600);
 
+        this.canvas.addMouseListener(LoginController.getLoginController());
+        this.canvas.addMouseMotionListener(LoginController.getLoginController());
         // Add the canvas and controls to the main GUI. Canvas above controls.
-        c.add(whiteBoardController);
+//        c.add(whiteBoardController);
         c.add(scroller);
-        this.frame.getContentPane().add(c, BorderLayout.SOUTH);
-//        c.revalidate();
-//        c.repaint();
+        this.frame.getContentPane().add(c, BorderLayout.WEST);
         this.frame.getContentPane().revalidate();
         this.frame.getContentPane().repaint();
-//        this.frame.revalidate();
-//        this.frame.repaint();
     }
 }

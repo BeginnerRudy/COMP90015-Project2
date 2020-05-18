@@ -13,24 +13,28 @@ public class WhiteBoardController extends JPanel
         KeyListener {
     private WhiteBoard canvas;
     private IRemoteWhiteBoard remoteWhiteBoard;
-    //    private WhiteBoard canvas
-    // Points for drawing lines.
     private Point lastPoint, firstPoint;
     private String username;
+
+    // Drawing mode selector.
+    private final JComboBox<Mode> modeSelect;
 
     public WhiteBoardController(WhiteBoard canvas, IRemoteWhiteBoard remoteWhiteBoard, String username){
         this.canvas = canvas;
         this.remoteWhiteBoard = remoteWhiteBoard;
         this.username = username;
-//        try {
-//            remoteShape.addMouseListener(this);
-////            this.addMouseMotionListener(this);
-//        }catch (RemoteException e){
-//            e.printStackTrace();
-//        }
-
         this.canvas.addMouseListener(this);
-//        remoteShape.addKeyListener(this);
+
+        this.modeSelect = new JComboBox<>(Mode.values());
+        this.modeSelect.setEditable(false);
+        this.modeSelect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("action!!!");
+                modeSelect.showPopup();
+            }
+        });
+        this.add(modeSelect);
     }
 
     private void drawLine(Point nextPoint){
@@ -39,22 +43,12 @@ public class WhiteBoardController extends JPanel
             return;
         }
 
-//        if (firstPoint == null) // Store the first point passed if none is held.
-//            firstPoint = nextPoint;
-
-//        WhiteboardMessage msg = new WhiteboardMessage(lastPoint, nextPoint,
-//                colour, lineWeight);
         try{
             remoteWhiteBoard.drawLine(this.username, new MyPoint(lastPoint.x, lastPoint.y), new MyPoint(nextPoint.x, nextPoint.y));
         }catch (RemoteException e){
             e.printStackTrace();
         }
-        lastPoint = canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
-
-//        msg.addUniqueID();
-//        Client.getInstance().broadCastMessage(msg);
-//        Server.messages.put(msg.getUniqueID(), msg);
-//        remoteShape.drawLine();
+//        canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
     }
 
     @Override
@@ -62,9 +56,7 @@ public class WhiteBoardController extends JPanel
 
         canvas.requestFocusInWindow();
         Point newPoint = e.getPoint();
-//        lastPoint = newPoint;
         drawLine(newPoint);
-//        lastPoint = null;
         System.out.println("clicked !!");
     }
 

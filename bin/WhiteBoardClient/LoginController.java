@@ -5,8 +5,12 @@ import WhiteBoardServer.SerializableBufferedImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import javax.swing.text.Position;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,10 +18,11 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class LoginController extends UnicastRemoteObject implements IRemoteClient {
+public class LoginController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener {
     private static LoginController loginController;
     private String username;
     private boolean isManger = false;
+    private MyPoint lastPoint, firstPoint;
 
     static {
         try {
@@ -228,7 +233,73 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     @Override
     public void drawLine(MyPoint start, MyPoint end) throws RemoteException {
 //        this.whiteBoardClientGUI.canvas.requestFocusInWindow();
-        this.whiteBoardClientGUI.canvas.drawLine(new Point(start.x, start.y), new Point(end.x, end.y), Color.orange, 1);
+//        this.whiteBoardClientGUI.canvas.drawLine(start, end, Color.orange, 1);
 //        canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+//        System.out.println("clicked");
+//        if (lastPoint == null) {
+//            lastPoint = new MyPoint(e.getPoint());
+//        } else {
+//            this.lastPoint = null;
+//        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+//        System.out.println("pressed");
+        this.whiteBoardClientGUI.canvas.fixed = false;
+        this.whiteBoardClientGUI.canvas.lastPoint = new MyPoint(e.getPoint());
+//        this.lastPoint = new MyPoint(e.getPoint());
+//        this.whiteBoardClientGUI.canvas.repaint();
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+//        System.out.println("released");
+        this.whiteBoardClientGUI.canvas.fixed = true;
+        this.whiteBoardClientGUI.canvas.repaint();
+
+//        this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
+//        this.firstPoint = new MyPoint(e.getPoint());
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+//        System.out.println("dragged");
+        this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
+        this.whiteBoardClientGUI.canvas.repaint();
+//        if (lastPoint == null) {
+//            lastPoint = new MyPoint(e.getPoint());
+//        } else {
+//            try {
+//                this.whiteBoardClientGUI.canvas.requestFocusInWindow();
+//                MyPoint nextPoint = new MyPoint(e.getPoint());
+//                this.drawLine(lastPoint, firstPoint);
+//                this.remoteWhiteBoard.drawLine(this.username, lastPoint, nextPoint);
+//                this.lastPoint = null;
+//            } catch (RemoteException ee) {
+//                ee.printStackTrace();
+//            }
+//        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+//        System.out.println("Mouved");
     }
 }

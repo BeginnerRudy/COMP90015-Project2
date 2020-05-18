@@ -20,6 +20,9 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     private BufferedImage canvas;
+    public MyPoint lastPoint, firstPoint;
+    public boolean fixed = false;
+
 
     public WhiteBoard(int width, int length){
         this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
@@ -55,8 +58,7 @@ public class WhiteBoard extends JPanel implements Serializable {
 
         this.repaint();
     }
-
-    public Point drawLine(Point start, Point end, Color colour, int size){
+    public MyPoint drawLine(MyPoint start, MyPoint end, Color colour, int size){
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
 
@@ -74,7 +76,7 @@ public class WhiteBoard extends JPanel implements Serializable {
 
         // setup the g for drawing
         g.setColor(col);
-        g.setStroke(new BasicStroke(weight));
+//        g.setStroke(new BasicStroke(weight));
 
         // Draw a line
         synchronized (WhiteBoard.class){
@@ -82,9 +84,35 @@ public class WhiteBoard extends JPanel implements Serializable {
         }
 
         // render the line
-        this.revalidate();
+//        this.revalidate();
         this.repaint();
-        System.out.println("draw line");
+//        System.out.println("draw line");
+        // return the end point
+        return end;
+    }
+
+    public MyPoint drawLine(Graphics g, MyPoint start, MyPoint end, Color colour, int size){
+        this.requestFocusInWindow();
+        // set default color and weight
+        Color col = Color.BLACK;
+        int weight = 1;
+
+        // check and receive input parameters
+        if (colour != null){
+            col = colour;
+        }
+        // setup the g for drawing
+        g.setColor(col);
+
+        // Draw a line
+        synchronized (WhiteBoard.class){
+            g.drawLine(start.x, start.y, end.x, end.y);
+        }
+
+        // render the line
+//        this.revalidate();
+//        this.repaint();
+//        System.out.println("draw line");
         // return the end point
         return end;
     }
@@ -105,16 +133,37 @@ public class WhiteBoard extends JPanel implements Serializable {
     @Override
     protected void paintComponent(Graphics g)
     {
+        super.paintComponent(g);
         Graphics2D graphics = (Graphics2D)g.create();
-        Map<RenderingHints.Key, Object> hintMap = new HashMap<>();
-        // Set any rendering hints.
-        hintMap.put(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        hintMap.put(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-
-        RenderingHints hints = new RenderingHints(hintMap);
-        graphics.setRenderingHints(hints);
+//
+//        Map<RenderingHints.Key, Object> hintMap = new HashMap<>();
+//        // Set any rendering hints.
+//        hintMap.put(RenderingHints.KEY_TEXT_ANTIALIASING,
+//                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//        hintMap.put(RenderingHints.KEY_ANTIALIASING,
+//                RenderingHints.VALUE_ANTIALIAS_ON);
+//
+//        RenderingHints hints = new RenderingHints(hintMap);
+//        graphics.setRenderingHints(hints);
         graphics.drawImage(canvas, 0, 0, Color.WHITE, null);
+        if (lastPoint != null && firstPoint != null ) {
+            if (!fixed){
+                this.drawLine(g, lastPoint, firstPoint, Color.BLACK, 1);
+                System.out.println("not fixed");
+            }else {
+                System.out.println("fixed");
+                this.drawLine(lastPoint, firstPoint, Color.BLACK, 1);
+                this.firstPoint = null;
+                this.lastPoint = null;
+            }
+        }
+
     }
+
+//    @Override
+//    public void paint(Graphics g) {
+//        super.paint(g);
+//        if (lastPoint != null && firstPoint != null)
+//            g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
+//    }
 }
