@@ -12,12 +12,16 @@ import java.util.Hashtable;
 public class SerializableBufferedImage implements Serializable {
     private BufferedImage canvas;
 
-    public BufferedImage getWhiteBoard(){
+    public BufferedImage getWhiteBoard() {
         return this.canvas;
     }
 
     public SerializableBufferedImage(int width, int height) {
         canvas = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    public SerializableBufferedImage(BufferedImage canvas) {
+        this.canvas = canvas;
     }
 
     private void writeObject(java.io.ObjectOutputStream stream)

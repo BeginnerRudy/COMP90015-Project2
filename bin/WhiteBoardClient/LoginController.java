@@ -3,10 +3,13 @@ package WhiteBoardClient;
 import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardServer.SerializableBufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -36,20 +39,56 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         return loginController;
     }
 
-    public void kick(String username) {
+    public void saveAs(File out) {
         try {
+            ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", out);
 
-            this.remoteWhiteBoard.kick(username);
-        }catch (RemoteException e){
+//            File outfile = new File("./data/Untitled" + System.currentTimeMillis() + ".png");
+//            ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", outfile);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void save(){
+    public void open(File canvas) {
+        //TODO could the manger open or create more than one whiteboard at one time ?
         try {
-            this.remoteWhiteBoard.save(username);
-        }catch (RemoteException e){
+            BufferedImage imageOnDisk = ImageIO.read(canvas);
+            this.whiteBoardClientGUI.createCanvas(imageOnDisk, remoteWhiteBoard, this.username);
+            this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
+
+        } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void kick(String username) {
+        try {
+
+            this.remoteWhiteBoard.kick(username);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void save() {
+        if (this.whiteBoardClientGUI.canvas.getWhiteBoard() != null) {
+            try {
+//            BufferedImage bi = this.canvas.getWhiteBoard().getType();  // retrieve image
+                File outfile = new File("./data/Untitled" + System.currentTimeMillis() + ".png");
+                ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", outfile);
+
+//            this.close(manager);
+            } catch (IOException ee) {
+                // handle exception
+                ee.printStackTrace();
+            }
+        } else {
+            try {
+                this.say("No whiteboard to save, please create one first");
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -159,10 +198,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         }).start();
     }
 
-    public void createWhiteBoard(){
+    public void createWhiteBoard() {
         try {
-            this.whiteBoardClientGUI.createCanvas(this.remoteWhiteBoard.create().getWhiteBoard(), remoteWhiteBoard, this.username);
-        }catch (RemoteException e){
+            SerializableBufferedImage canvas = new SerializableBufferedImage(300, 300);
+            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+            this.remoteWhiteBoard.create(canvas);
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }

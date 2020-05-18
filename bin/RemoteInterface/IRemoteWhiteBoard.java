@@ -20,9 +20,13 @@ public interface IRemoteWhiteBoard extends Remote {
 
     boolean kick(String username) throws RemoteException;
 
-    SerializableBufferedImage create() throws RemoteException;
+    SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException;
 
     void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException;
 
     void save(String username) throws RemoteException;
+
+    void showAllWhiteBoards(String username) throws RemoteException;
+
+    void open(String filename) throws RemoteException;
 }

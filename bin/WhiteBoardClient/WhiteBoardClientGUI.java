@@ -8,7 +8,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * @author Chaoxian Zhou, Yangyang Long, Jiuzhou Han, Wentao Yan
@@ -146,15 +150,40 @@ public class WhiteBoardClientGUI {
         JMenuItem s2 = new JMenuItem("SubMenuItem2");
 
         // add ActionListener to menuItems
-        m1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Click on save");
-                LoginController.getLoginController().save();
-            }
+        m1.addActionListener(e -> {
+            System.out.println("Click on save");
+            LoginController.getLoginController().save();
         });
-        m2.addActionListener(e -> System.out.println("Click on save as"));
-        m3.addActionListener(e -> System.out.println("Click on open"));
+
+        m2.addActionListener(e -> {
+
+            System.out.println("Click on Save as");
+            JFileChooser j = new JFileChooser("./data/");
+            j.showDialog(this.frame, "Save as");
+            j.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+//            String filename = "d.png";
+            File file = j.getSelectedFile();
+            if (file == null) {
+                System.out.println("no file selected");
+                return;
+            }
+            LoginController.getLoginController().saveAs(file);
+        });
+
+        m3.addActionListener(e -> {
+            System.out.println("Click on open");
+
+            JFileChooser filePicker = new JFileChooser("./data");
+            filePicker.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            filePicker.showDialog(this.frame, "Select File");
+
+            File file = filePicker.getSelectedFile();
+            if (file == null) {
+                System.out.println("no file selected");
+                return;
+            }
+            LoginController.getLoginController().open(file);
+        });
 
         // add menu items to menu
         x.add(m1);

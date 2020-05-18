@@ -139,13 +139,14 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     @Override
-    public SerializableBufferedImage create() throws RemoteException {
-        this.canvas = new SerializableBufferedImage(300, 300);
-        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(2));
-        Random random = new Random();
-        g.drawLine(random.nextInt(200), random.nextInt(200), random.nextInt(200), random.nextInt(200));
+    public SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException {
+//        this.canvas = new SerializableBufferedImage(300, 300);
+//        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+//        g.setColor(Color.BLACK);
+//        g.setStroke(new BasicStroke(2));
+//        Random random = new Random();
+//        g.drawLine(random.nextInt(200), random.nextInt(200), random.nextInt(200), random.nextInt(200));
+        this.canvas = canvas;
         broadcastWhiteBoard();
         return this.canvas;
     }
@@ -185,6 +186,16 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         } else {
             this.users.get(username).say("You are not allowed to save the image");
         }
+    }
+
+    @Override
+    public void showAllWhiteBoards(String username) throws RemoteException {
+
+    }
+
+    @Override
+    public void open(String filename) throws RemoteException {
+
     }
 
     private void broadcastWhiteBoard() throws RemoteException {

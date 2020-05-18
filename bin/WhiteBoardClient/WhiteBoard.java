@@ -15,6 +15,10 @@ import java.util.concurrent.TimeUnit;
 
 public class WhiteBoard extends JPanel implements Serializable {
 
+    public BufferedImage getCanvas() {
+        return canvas;
+    }
+
     private BufferedImage canvas;
 
     public WhiteBoard(int width, int length){
