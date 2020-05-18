@@ -3,6 +3,8 @@ package WhiteBoardClient;
 import RemoteInterface.IRemoteWhiteBoard;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -41,6 +43,8 @@ public class WhiteBoardClientGUI {
     WhiteBoardController whiteBoardController;
     JScrollPane scroller;
     JButton createBtn;
+
+    public JMenuBar mb;
 
     /**
      * Create an empty constructor here for 'Client_Connection' to determine who is the manager and who are clients
@@ -125,8 +129,44 @@ public class WhiteBoardClientGUI {
         panel.add(createBtn);
         createBtn.setVisible(false);
 
-        frame.getContentPane().add(panel, BorderLayout.EAST);
 
+        // Add menu bar
+        // create a menubar
+        mb = new JMenuBar();
+
+        // create a menu
+        JMenu x = new JMenu("Menu");
+        JMenu x1 = new JMenu("submenu");
+
+        // create menuitems
+        JMenuItem m1 = new JMenuItem("Save");
+        JMenuItem m2 = new JMenuItem("Save As");
+        JMenuItem m3 = new JMenuItem("Open");
+        JMenuItem s1 = new JMenuItem("SubMenuItem1");
+        JMenuItem s2 = new JMenuItem("SubMenuItem2");
+
+        // add ActionListener to menuItems
+        m1.addActionListener(e -> System.out.println("Click on save"));
+        m2.addActionListener(e -> System.out.println("Click on save as"));
+        m3.addActionListener(e -> System.out.println("Click on open"));
+
+        // add menu items to menu
+        x.add(m1);
+        x.add(m2);
+        x.add(m3);
+        x1.add(s1);
+        x1.add(s2);
+
+        // add submenu
+        x.add(x1);
+
+        // add menu to menu bar
+        mb.add(x);
+
+        // add menubar to frame
+        frame.setJMenuBar(mb);
+        mb.setVisible(false);
+        frame.getContentPane().add(panel, BorderLayout.EAST);
 
 
         quitBoardContentButton.addMouseListener(new MouseAdapter() {
@@ -164,7 +204,7 @@ public class WhiteBoardClientGUI {
         });
     }
 
-    public void createCanvas(BufferedImage canvas, IRemoteWhiteBoard remoteWhiteBoard, String username){
+    public void createCanvas(BufferedImage canvas, IRemoteWhiteBoard remoteWhiteBoard, String username) {
         //        Container contentPane = this.frame.getContentPane();
         Panel c = new Panel();
         this.canvas = new WhiteBoard(canvas);

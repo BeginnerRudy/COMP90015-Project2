@@ -81,6 +81,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
                     this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
                     this.whiteBoardClientGUI.kickButton.setVisible(true);
                     this.whiteBoardClientGUI.createBtn.setVisible(true);
+                    this.whiteBoardClientGUI.mb.setVisible(true);
                 }
 
                 // get user lists from remote
