@@ -4,31 +4,26 @@ import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardClient.IRemoteClient;
 import WhiteBoardClient.MyPoint;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
-    private HashMap<String, IRemoteClient> users = new HashMap<>();
-    private String manager;
-    private SerializableBufferedImage canvas;
+    private ConcurrentHashMap<String, IRemoteClient> users = new ConcurrentHashMap<>(); // stores a hash map between username and its remote interface
+    private String manager; // The username of the manager
+    private SerializableBufferedImage canvas; // This image stores the whiteboard image
 
     protected RemoteWhiteBoardServant() throws RemoteException {
+
     }
 
     @Override
-    public boolean join(String username, IRemoteClient remoteClient) throws RemoteException {
+    public synchronized boolean join(String username, IRemoteClient remoteClient) throws RemoteException {
         // check if the name has been taken
         if (!this.users.containsKey(username)) {
-
-
             // check if it is the first user
             if (manager == null) {
                 // this is the first user -> promote it to be the manager
@@ -95,7 +90,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     @Override
-    public boolean close(String username) throws RemoteException {
+    public synchronized boolean close(String username) throws RemoteException {
 
         // notify all the other user in the board that the board has been closed.
         if (!username.equals(manager)) {
@@ -112,7 +107,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     @Override
-    public boolean quit(String username) throws RemoteException {
+    public synchronized boolean quit(String username) throws RemoteException {
         // notify all the other user in the board this user quits
         this.users.remove(username);
         this.remove_user(username);
@@ -123,9 +118,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     @Override
     public ArrayList<String> getUserList() throws RemoteException {
         ArrayList<String> users_info = new ArrayList<>();
-        for (String username : this.users.keySet()) {
-            users_info.add(username);
-        }
+        users_info.addAll(this.users.keySet());
         return users_info;
     }
 
@@ -140,19 +133,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     @Override
     public SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException {
-//        this.canvas = new SerializableBufferedImage(300, 300);
-//        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
-//        g.setColor(Color.BLACK);
-//        g.setStroke(new BasicStroke(2));
-//        Random random = new Random();
-//        g.drawLine(random.nextInt(200), random.nextInt(200), random.nextInt(200), random.nextInt(200));
         this.canvas = canvas;
         broadcastWhiteBoard();
         return this.canvas;
     }
 
     @Override
-    public void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException {
+    public synchronized void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException {
         Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
         g.setColor(Color.orange);
         g.setStroke(new BasicStroke(1));
@@ -164,86 +151,82 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         }
     }
 
-    @Override
-    public void save(String username) throws RemoteException {
-        if (username.equals(manager)) {
-            if (this.canvas != null){
-                try {
-//            BufferedImage bi = this.canvas.getWhiteBoard().getType();  // retrieve image
-                    File outfile = new File("Untitled" + System.currentTimeMillis() + ".png");
-                    ImageIO.write(this.canvas.getWhiteBoard(), "png", outfile);
 
-//            this.close(manager);
-                } catch (IOException e) {
-                    // handle exception
-                    e.printStackTrace();
-                }
-            }else{
-                this.users.get(username).say("No whiteboard to save, please create one first");
-            }
-
-
-        } else {
-            this.users.get(username).say("You are not allowed to save the image");
-        }
-    }
-
-    @Override
-    public void showAllWhiteBoards(String username) throws RemoteException {
-
-    }
-
-    @Override
-    public void open(String filename) throws RemoteException {
-
-    }
-
-    private void broadcastWhiteBoard() throws RemoteException {
+    private void broadcastWhiteBoard() {
         for (String username : users.keySet()) {
             if (!username.equals(manager)) {
-                this.users.get(username).createCanvas(this.canvas);
+                new Thread(() -> {
+                    try {
+                        this.users.get(username).createCanvas(this.canvas);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         }
     }
 
-    private void updateUserList() throws RemoteException {
-        ArrayList<String> users_list = new ArrayList<String>();
-        users_list.addAll(this.users.keySet());
-        for (IRemoteClient remoteClient : users.values()) {
-            remoteClient.updateUserList(users_list);
-        }
-    }
 
     private void add_user(String username) throws RemoteException {
         for (IRemoteClient remoteClient : users.values()) {
-            remoteClient.addUser(username);
+            new Thread(() -> {
+                try {
+                    remoteClient.addUser(username);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
     }
 
     private void remove_user(String username) throws RemoteException {
         for (IRemoteClient remoteClient : users.values()) {
-            remoteClient.removeUser(username);
+            new Thread(() -> {
+                try {
+                    remoteClient.removeUser(username);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
     }
 
 
     private void closeGUI() throws RemoteException {
         for (IRemoteClient remoteClient : users.values()) {
-            remoteClient.closeGUI();
+            new Thread(() -> {
+                try {
+                    remoteClient.closeGUI();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
         this.canvas = null;
     }
 
     private void broadcasting(String message) throws RemoteException {
         for (IRemoteClient remoteClient : users.values()) {
-            remoteClient.say(message);
+            new Thread(() -> {
+                try {
+                    remoteClient.say(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
     }
 
     private void broadcasting(String message, String username) throws RemoteException {
         for (String user : users.keySet()) {
             if (user != username) {
-                users.get(user).say(message);
+                new Thread(() -> {
+                    try {
+                        users.get(user).say(message);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         }
     }

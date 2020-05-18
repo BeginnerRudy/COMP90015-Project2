@@ -1,13 +1,10 @@
 package WhiteBoardClient;
 
-import RemoteInterface.IRemoteShape;
 import RemoteInterface.IRemoteWhiteBoard;
-import WhiteBoardServer.RemoteWhiteBoard;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public class WhiteBoardController extends JPanel

@@ -1,11 +1,8 @@
 package RemoteInterface;
 
 import WhiteBoardClient.IRemoteClient;
-import WhiteBoardClient.WhiteBoard;
 import WhiteBoardServer.SerializableBufferedImage;
-import WhiteBoardServer.SerializablePoint;
 
-import java.awt.event.MouseListener;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 

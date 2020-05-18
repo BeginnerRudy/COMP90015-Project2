@@ -1,14 +1,9 @@
 package WhiteBoardClient;
 
-import RemoteInterface.IRemoteMath;
-import RemoteInterface.IRemoteShape;
 import RemoteInterface.IRemoteWhiteBoard;
-import WhiteBoardServer.RemoteWhiteBoardShapeServant;
 
-import java.awt.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.concurrent.TimeUnit;
 
 public class RemoteWhiteBoardClient {
     public static void main(String[] args) {
