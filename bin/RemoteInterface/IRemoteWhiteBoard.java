@@ -23,4 +23,6 @@ public interface IRemoteWhiteBoard extends Remote {
     SerializableBufferedImage create() throws RemoteException;
 
     void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException;
+
+    void save(String username) throws RemoteException;
 }

@@ -4,14 +4,18 @@ import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardClient.IRemoteClient;
 import WhiteBoardClient.MyPoint;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-        public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
+public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
     private HashMap<String, IRemoteClient> users = new HashMap<>();
     private String manager;
     private SerializableBufferedImage canvas;
@@ -61,7 +65,7 @@ import java.util.Random;
                     // send all user in the whiteboard
                     add_user(username);
                     // send this user the whiteboard, if there is one.
-                    if (this.canvas != null){
+                    if (this.canvas != null) {
                         remoteClient.createCanvas(this.canvas);
                     }
                     return true;
@@ -153,15 +157,39 @@ import java.util.Random;
         g.setStroke(new BasicStroke(1));
         g.drawLine(start.x, start.y, end.x, end.y);
         for (String user : users.keySet()) {
-            if (!user.equals(username)){
+            if (!user.equals(username)) {
                 this.users.get(user).drawLine(start, end);
             }
         }
     }
 
-    private void broadcastWhiteBoard() throws RemoteException{
+    @Override
+    public void save(String username) throws RemoteException {
+        if (username.equals(manager)) {
+            if (this.canvas != null){
+                try {
+//            BufferedImage bi = this.canvas.getWhiteBoard().getType();  // retrieve image
+                    File outfile = new File("Untitled" + System.currentTimeMillis() + ".png");
+                    ImageIO.write(this.canvas.getWhiteBoard(), "png", outfile);
+
+//            this.close(manager);
+                } catch (IOException e) {
+                    // handle exception
+                    e.printStackTrace();
+                }
+            }else{
+                this.users.get(username).say("No whiteboard to save, please create one first");
+            }
+
+
+        } else {
+            this.users.get(username).say("You are not allowed to save the image");
+        }
+    }
+
+    private void broadcastWhiteBoard() throws RemoteException {
         for (String username : users.keySet()) {
-            if (!username.equals(manager)){
+            if (!username.equals(manager)) {
                 this.users.get(username).createCanvas(this.canvas);
             }
         }

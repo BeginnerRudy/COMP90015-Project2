@@ -45,6 +45,14 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         }
     }
 
+    public void save(){
+        try {
+            this.remoteWhiteBoard.save(username);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+    }
+
     public void quit() {
         try {
             this.remoteWhiteBoard.quit(this.username);

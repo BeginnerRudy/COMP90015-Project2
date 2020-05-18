@@ -146,7 +146,13 @@ public class WhiteBoardClientGUI {
         JMenuItem s2 = new JMenuItem("SubMenuItem2");
 
         // add ActionListener to menuItems
-        m1.addActionListener(e -> System.out.println("Click on save"));
+        m1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Click on save");
+                LoginController.getLoginController().save();
+            }
+        });
         m2.addActionListener(e -> System.out.println("Click on save as"));
         m3.addActionListener(e -> System.out.println("Click on open"));
 
