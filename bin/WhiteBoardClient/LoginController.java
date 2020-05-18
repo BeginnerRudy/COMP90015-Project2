@@ -40,6 +40,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     }
 
     public void saveAs(File out) {
+
         try {
             ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", out);
 
