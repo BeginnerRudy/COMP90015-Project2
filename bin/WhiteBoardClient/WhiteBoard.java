@@ -14,6 +14,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class WhiteBoard extends JPanel implements Serializable {
+    public Mode getMode() {
+        return mode;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    private Mode mode = Mode.LINE;
 
     public BufferedImage getCanvas() {
         return canvas;
@@ -24,28 +33,17 @@ public class WhiteBoard extends JPanel implements Serializable {
     public boolean fixed = false;
 
 
-    public WhiteBoard(int width, int length){
+    public WhiteBoard(int width, int length) {
         this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
 //        drawLine();
     }
 
-    public WhiteBoard(BufferedImage canvas){
+    public WhiteBoard(BufferedImage canvas) {
         this.canvas = canvas;
     }
 
-//    private void writeObject(java.io.ObjectOutputStream stream)
-//            throws IOException {
-//        stream.writeInt(this.canvas.getWidth());
-//        stream.writeInt(this.canvas.getHeight());
-//        stream.writeInt(this.canvas.getType());
-//    }
-//
-//    private void readObject(java.io.ObjectInputStream stream)
-//            throws IOException, ClassNotFoundException {
-//        this.canvas = new SerializableBufferedImage(stream.readInt(), stream.readInt(), stream.readInt());
-//    }
 
-    public void drawLine(){
+    public void drawLine() {
 
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
         g.drawLine(10, 10, 1000, 1000);
@@ -58,20 +56,17 @@ public class WhiteBoard extends JPanel implements Serializable {
 
         this.repaint();
     }
-    public MyPoint drawLine(MyPoint start, MyPoint end, Color colour, int size){
+
+    public MyPoint drawLine(MyPoint start, MyPoint end, Color colour, int size) {
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
 
         // set default color and weight
         Color col = Color.BLACK;
-        int weight = 1;
 
         // check and receive input parameters
-        if (colour != null){
+        if (colour != null) {
             col = colour;
-        }
-        if (size > 0){
-            weight = size;
         }
 
         // setup the g for drawing
@@ -79,7 +74,7 @@ public class WhiteBoard extends JPanel implements Serializable {
 //        g.setStroke(new BasicStroke(weight));
 
         // Draw a line
-        synchronized (WhiteBoard.class){
+        synchronized (WhiteBoard.class) {
             g.drawLine(start.x, start.y, end.x, end.y);
         }
 
@@ -91,37 +86,30 @@ public class WhiteBoard extends JPanel implements Serializable {
         return end;
     }
 
-    public MyPoint drawLine(Graphics g, MyPoint start, MyPoint end, Color colour, int size){
+    public void drawRect(MyPoint start, MyPoint end){
         this.requestFocusInWindow();
+        Graphics2D g = (Graphics2D) this.canvas.getGraphics();
+
         // set default color and weight
         Color col = Color.BLACK;
-        int weight = 1;
-
-        // check and receive input parameters
-        if (colour != null){
-            col = colour;
-        }
-        // setup the g for drawing
         g.setColor(col);
-
         // Draw a line
-        synchronized (WhiteBoard.class){
-            g.drawLine(start.x, start.y, end.x, end.y);
+        synchronized (WhiteBoard.class) {
+            System.out.println(String.format("start (%d, %d), end (%d , %d)", start.x, start.y, end.x, end.y));
+            g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
         }
 
         // render the line
-//        this.revalidate();
-//        this.repaint();
-//        System.out.println("draw line");
-        // return the end point
-        return end;
+        this.revalidate();
+        this.repaint();
     }
 
-    public BufferedImage getWhiteBoard() { return this.canvas; }
+    public BufferedImage getWhiteBoard() {
+        return this.canvas;
+    }
 
     @Override
-    public Dimension getPreferredSize()
-    {
+    public Dimension getPreferredSize() {
         return new Dimension(canvas.getWidth(), canvas.getHeight());
     }
 
@@ -131,29 +119,40 @@ public class WhiteBoard extends JPanel implements Serializable {
      * @param g The instance to draw with.
      */
     @Override
-    protected void paintComponent(Graphics g)
-    {
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D graphics = (Graphics2D)g.create();
-//
-//        Map<RenderingHints.Key, Object> hintMap = new HashMap<>();
-//        // Set any rendering hints.
-//        hintMap.put(RenderingHints.KEY_TEXT_ANTIALIASING,
-//                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//        hintMap.put(RenderingHints.KEY_ANTIALIASING,
-//                RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//        RenderingHints hints = new RenderingHints(hintMap);
-//        graphics.setRenderingHints(hints);
+        Graphics2D graphics = (Graphics2D) g.create();
         graphics.drawImage(canvas, 0, 0, Color.WHITE, null);
-        if (lastPoint != null && firstPoint != null ) {
-            if (!fixed){
-                this.drawLine(g, lastPoint, firstPoint, Color.BLACK, 1);
+        if (lastPoint != null && firstPoint != null) {
+            if (!fixed) {
+                switch (mode) {
+                    case LINE:
+                        g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
+                        break;
+                    case RECTANGLE:
+                        g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
+                        break;
+                    default:
+                        System.out.println("not support");
+                }
                 System.out.println("not fixed");
-            }else {
+            } else {
                 System.out.println(lastPoint.x);
                 System.out.println(firstPoint.y);
-                this.drawLine(lastPoint, firstPoint, Color.BLACK, 1);
+
+                switch (mode) {
+                    case LINE:
+//                        g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
+                        this.drawLine(lastPoint, firstPoint, Color.BLACK, 1);
+                        break;
+                    case RECTANGLE:
+                        this.drawRect(lastPoint, firstPoint);
+//                        g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
+                        break;
+                    default:
+                        System.out.println("not support");
+                }
+
                 this.firstPoint = null;
                 this.lastPoint = null;
                 System.out.println("fixed");

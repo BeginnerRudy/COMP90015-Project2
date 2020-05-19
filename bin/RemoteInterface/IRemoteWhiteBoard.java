@@ -1,6 +1,7 @@
 package RemoteInterface;
 
 import WhiteBoardClient.IRemoteClient;
+import WhiteBoardClient.Mode;
 import WhiteBoardClient.MyPoint;
 import WhiteBoardServer.SerializableBufferedImage;
 
@@ -21,5 +22,5 @@ public interface IRemoteWhiteBoard extends Remote {
 
     ArrayList<String> getUserList() throws RemoteException;
 
-    void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException;
+    void drawLine(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException;
 }

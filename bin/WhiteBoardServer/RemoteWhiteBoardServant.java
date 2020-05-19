@@ -2,13 +2,13 @@ package WhiteBoardServer;
 
 import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardClient.IRemoteClient;
+import WhiteBoardClient.Mode;
 import WhiteBoardClient.MyPoint;
 
 import java.awt.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -140,18 +140,24 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     @Override
-    public synchronized void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException {
+    public synchronized void drawLine(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException {
         System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
         System.out.println(String.format("End: (%d, %d)", end.x, end.y));
         Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
         g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(1));
-        Random random = new Random();
-        g.drawLine(start.x, start.y, end.x, end.y);
-//        g.drawLine(10, 10 ,100 ,100);
+        switch (mode) {
+            case LINE:
+                g.drawLine(start.x, start.y, end.x, end.y);
+                break;
+            case RECTANGLE:
+                g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
+                break;
+            default:
+                System.out.println("not support");
+        }
         for (String user : users.keySet()) {
             if (!user.equals(username)) {
-                this.users.get(user).drawLine(start, end);
+                this.users.get(user).draw(start, end, mode);
             }
         }
     }

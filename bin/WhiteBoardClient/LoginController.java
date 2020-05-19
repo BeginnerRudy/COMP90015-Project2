@@ -5,8 +5,6 @@ import WhiteBoardServer.SerializableBufferedImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -23,7 +21,6 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     private String username;
     private boolean isManger = false;
     private MyPoint lastPoint, firstPoint;
-    private Mode mode = Mode.LINE;
 
     static {
         try {
@@ -41,9 +38,9 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     protected LoginController() throws RemoteException {
     }
 
-    public void changeMode(Mode mode){
-        this.mode = mode;
-        System.out.println(mode);
+    public void changeMode(Mode mode) {
+        this.whiteBoardClientGUI.canvas.setMode(mode);
+        System.out.println(mode); // TODO debug
     }
 
     public static LoginController getLoginController() {
@@ -237,13 +234,25 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     }
 
     @Override
-    public void drawLine(MyPoint start, MyPoint end) throws RemoteException {
+    public void draw(MyPoint start, MyPoint end, Mode mode) throws RemoteException {
         this.whiteBoardClientGUI.canvas.requestFocusInWindow();
 //        this.whiteBoardClientGUI.canvas.drawLine(start, end, Color.BLACK, 1);
 //        canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
         this.whiteBoardClientGUI.canvas.lastPoint = start;
         this.whiteBoardClientGUI.canvas.firstPoint = end;
         this.whiteBoardClientGUI.canvas.fixed = true;
+
+        switch (mode) {
+            case LINE:
+                this.whiteBoardClientGUI.canvas.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, Color.BLACK, 1);
+                break;
+            case RECTANGLE:
+                this.whiteBoardClientGUI.canvas.drawRect(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
+                break;
+            default:
+                System.out.println("not support");
+        }
+
         this.whiteBoardClientGUI.canvas.repaint();
     }
 
@@ -271,10 +280,11 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     public void mouseReleased(MouseEvent e) {
 //        System.out.println("released");
         try {
-            System.out.println(String.format("Start: (%d, %d)", this.whiteBoardClientGUI.canvas.lastPoint.x, this.whiteBoardClientGUI.canvas.lastPoint.y));
-            System.out.println(String.format("End: (%d, %d)", this.whiteBoardClientGUI.canvas.firstPoint.x, this.whiteBoardClientGUI.canvas.firstPoint.y));
-            this.remoteWhiteBoard.drawLine(this.username, this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
-            this.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
+//            System.out.println(String.format("Start: (%d, %d)", this.whiteBoardClientGUI.canvas.lastPoint.x, this.whiteBoardClientGUI.canvas.lastPoint.y));
+//            System.out.println(String.format("End: (%d, %d)", this.whiteBoardClientGUI.canvas.firstPoint.x, this.whiteBoardClientGUI.canvas.firstPoint.y));
+            this.remoteWhiteBoard.drawLine(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
+                    this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
+            this.draw(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
         } catch (RemoteException ee) {
             ee.printStackTrace();
         }
