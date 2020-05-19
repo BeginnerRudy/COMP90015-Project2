@@ -23,6 +23,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     private String username;
     private boolean isManger = false;
     private MyPoint lastPoint, firstPoint;
+    private Mode mode = Mode.LINE;
 
     static {
         try {
@@ -38,6 +39,11 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     private IRemoteWhiteBoard remoteWhiteBoard;
 
     protected LoginController() throws RemoteException {
+    }
+
+    public void changeMode(Mode mode){
+        this.mode = mode;
+        System.out.println(mode);
     }
 
     public static LoginController getLoginController() {

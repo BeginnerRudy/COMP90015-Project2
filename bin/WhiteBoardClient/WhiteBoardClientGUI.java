@@ -3,10 +3,7 @@ package WhiteBoardClient;
 import RemoteInterface.IRemoteWhiteBoard;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -44,9 +41,12 @@ public class WhiteBoardClientGUI {
     BufferedImage getIma;
 
     public WhiteBoard canvas;
-//    WhiteBoardController whiteBoardController;
+    //    WhiteBoardController whiteBoardController;
     JScrollPane scroller;
     JButton createBtn;
+
+    // Drawing mode selector.
+    public JComboBox<Mode> modeSelect;
 
     public JMenuBar mb;
 
@@ -236,10 +236,23 @@ public class WhiteBoardClientGUI {
         JPanel c = new JPanel();
 
         this.canvas = new WhiteBoard(canvas);
+        this.modeSelect = new JComboBox<>(Mode.values());
+        this.modeSelect.setEditable(false);
 //        whiteBoardController = new WhiteBoardController(this.canvas, remoteWhiteBoard, username);
 
         this.scroller = new JScrollPane(this.canvas);
         this.scroller.setBackground(Color.LIGHT_GRAY);
+        this.modeSelect.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == 1){
+                    LoginController.getLoginController().changeMode((Mode) e.getItem());
+                }
+            }
+        });
+
+        c.add(this.modeSelect);
+
 
         this.canvas.addMouseListener(LoginController.getLoginController());
         this.canvas.addMouseMotionListener(LoginController.getLoginController());
