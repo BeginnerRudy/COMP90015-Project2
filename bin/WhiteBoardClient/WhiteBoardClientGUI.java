@@ -66,7 +66,7 @@ public class WhiteBoardClientGUI {
         // Initialize the frame
         frame = new JFrame();
 
-        this.frame.setSize(1400, 1400);
+        this.frame.setSize(900, 900);
         frame.setLayout(new BorderLayout());
         frame.setTitle("Client Whiteboard ");
 

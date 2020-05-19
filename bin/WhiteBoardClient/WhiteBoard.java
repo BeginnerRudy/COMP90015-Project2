@@ -84,7 +84,7 @@ public class WhiteBoard extends JPanel implements Serializable {
         }
 
         // render the line
-//        this.revalidate();
+        this.revalidate();
         this.repaint();
 //        System.out.println("draw line");
         // return the end point
@@ -151,10 +151,12 @@ public class WhiteBoard extends JPanel implements Serializable {
                 this.drawLine(g, lastPoint, firstPoint, Color.BLACK, 1);
                 System.out.println("not fixed");
             }else {
-                System.out.println("fixed");
+                System.out.println(lastPoint.x);
+                System.out.println(firstPoint.y);
                 this.drawLine(lastPoint, firstPoint, Color.BLACK, 1);
                 this.firstPoint = null;
                 this.lastPoint = null;
+                System.out.println("fixed");
             }
         }
 

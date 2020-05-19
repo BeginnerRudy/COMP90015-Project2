@@ -144,6 +144,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         g.setColor(Color.orange);
         g.setStroke(new BasicStroke(1));
         g.drawLine(start.x, start.y, end.x, end.y);
+//        g.drawLine(10, 10 ,100 ,100);
         for (String user : users.keySet()) {
             if (!user.equals(username)) {
                 this.users.get(user).drawLine(start, end);
