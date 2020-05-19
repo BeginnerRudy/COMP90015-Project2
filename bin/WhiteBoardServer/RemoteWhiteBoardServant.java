@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
@@ -140,9 +141,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     @Override
     public synchronized void drawLine(String username, MyPoint start, MyPoint end) throws RemoteException {
+        System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
+        System.out.println(String.format("End: (%d, %d)", end.x, end.y));
         Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
-        g.setColor(Color.orange);
+        g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(1));
+        Random random = new Random();
         g.drawLine(start.x, start.y, end.x, end.y);
 //        g.drawLine(10, 10 ,100 ,100);
         for (String user : users.keySet()) {

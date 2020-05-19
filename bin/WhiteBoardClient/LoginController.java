@@ -265,12 +265,15 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     public void mouseReleased(MouseEvent e) {
 //        System.out.println("released");
         try {
-            this.remoteWhiteBoard.drawLine(this.username, this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.lastPoint);
+            System.out.println(String.format("Start: (%d, %d)", this.whiteBoardClientGUI.canvas.lastPoint.x, this.whiteBoardClientGUI.canvas.lastPoint.y));
+            System.out.println(String.format("End: (%d, %d)", this.whiteBoardClientGUI.canvas.firstPoint.x, this.whiteBoardClientGUI.canvas.firstPoint.y));
+            this.remoteWhiteBoard.drawLine(this.username, this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
+            this.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
         } catch (RemoteException ee) {
             ee.printStackTrace();
         }
-        this.whiteBoardClientGUI.canvas.fixed = true;
-        this.whiteBoardClientGUI.canvas.repaint();
+//        this.whiteBoardClientGUI.canvas.fixed = true;
+//        this.whiteBoardClientGUI.canvas.repaint();
 
 //        this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
 //        this.firstPoint = new MyPoint(e.getPoint());
