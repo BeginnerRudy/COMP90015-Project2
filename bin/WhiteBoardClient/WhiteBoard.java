@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
+
 public class WhiteBoard extends JPanel implements Serializable {
     private Mode mode = Mode.LINE;
 
@@ -23,6 +24,7 @@ public class WhiteBoard extends JPanel implements Serializable {
     public WhiteBoard(BufferedImage canvas) {
         this.canvas = canvas;
     }
+
     /*========================================Getters and Setters========================================*/
     public BufferedImage getWhiteBoard() {
         return this.canvas;
@@ -37,7 +39,7 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     /*========================================Drawing features========================================*/
-    public MyPoint drawLine(MyPoint start, MyPoint end, Color colour, int size) {
+    public void drawLine(MyPoint start, MyPoint end, Color colour, int size) {
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
 
@@ -57,14 +59,13 @@ public class WhiteBoard extends JPanel implements Serializable {
             g.drawLine(start.x, start.y, end.x, end.y);
         }
 
-        if (this.mode == Mode.FREEHAND){
+        if (this.mode == Mode.FREEHAND) {
             lastPoint = firstPoint;
         }
 
         // render the line
         this.revalidate();
         this.repaint();
-        return end;
     }
 
     public void drawRect(MyPoint start, MyPoint end) {
@@ -82,6 +83,27 @@ public class WhiteBoard extends JPanel implements Serializable {
 
         // render the line
         this.revalidate();
+        this.repaint();
+    }
+
+    private int getRadius(MyPoint start, MyPoint end) {
+        return (int) Math.sqrt(Math.pow(Math.abs(start.x - end.x), 2) + Math.pow(Math.abs(start.x - end.x), 2));
+    }
+
+    public void drawCircle(MyPoint start, MyPoint end) {
+        Graphics2D g = (Graphics2D) canvas.getGraphics();
+        Font f = new Font("Serif", Font.PLAIN, 12);
+        Color col = Color.BLACK;
+
+        g.setColor(col);
+        g.setFont(f);
+
+        int radius = getRadius(start, end);
+        synchronized (WhiteBoard.class) {
+            g.drawOval(start.x, start.y, radius, radius);
+        }
+        FontMetrics metrics = g.getFontMetrics();
+
         this.repaint();
     }
 
@@ -104,6 +126,7 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     /*========================================Enable Drag Drawing========================================*/
+
     /**
      * Paints the contents of the canvas to the JPane.
      *
@@ -118,11 +141,20 @@ public class WhiteBoard extends JPanel implements Serializable {
             if (!fixed) {
                 switch (mode) {
                     case LINE:
-                        g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
+                        synchronized (WhiteBoard.class) {
+                            g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
+                        }
                         break;
                     case RECTANGLE:
-                        g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
+                        synchronized (WhiteBoard.class) {
+                            g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
+                        }
                         break;
+                    case CIRCLE:
+                        int radius = getRadius(lastPoint, firstPoint);
+                        synchronized (WhiteBoard.class) {
+                            g.drawOval(lastPoint.x, lastPoint.y, radius, radius);
+                        }
                     default:
                         System.out.println("not support");
                 }
@@ -138,11 +170,13 @@ public class WhiteBoard extends JPanel implements Serializable {
                     case RECTANGLE:
                         this.drawRect(lastPoint, firstPoint);
                         break;
+                    case CIRCLE:
+                        this.drawCircle(lastPoint, firstPoint);
                     default:
                         System.out.println("not support");
                 }
 
-                if (this.getMode() != Mode.TEXT){
+                if (this.getMode() != Mode.TEXT) { // no need to make it null for the text case
                     this.firstPoint = null;
                     this.lastPoint = null;
                     System.out.println("fixed");
