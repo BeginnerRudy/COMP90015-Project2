@@ -256,7 +256,7 @@ public class WhiteBoardClientGUI {
 
         this.canvas.addMouseListener(LoginController.getLoginController());
         this.canvas.addMouseMotionListener(LoginController.getLoginController());
-        this.canvas.addKeyListener(LoginController.getLoginController()sdf);
+        this.canvas.addKeyListener(LoginController.getLoginController());
         // Add the canvas and controls to the main GUI. Canvas above controls.
 //        c.add(whiteBoardController);
         c.add(scroller);

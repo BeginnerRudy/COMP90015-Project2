@@ -19,6 +19,10 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     private String username;
     private boolean isManger = false;
     private MyPoint lastPoint, firstPoint;
+    private LoginFrame loginFrame;
+    private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
+    private IRemoteWhiteBoard remoteWhiteBoard;
+
 
     static {
         try {
@@ -28,31 +32,40 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         }
     }
 
-    private LoginFrame loginFrame;
-    private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
-    ;
-    private IRemoteWhiteBoard remoteWhiteBoard;
-
     protected LoginController() throws RemoteException {
-    }
-
-    public void changeMode(Mode mode) {
-        this.whiteBoardClientGUI.canvas.setMode(mode);
-        System.out.println(mode); // TODO debug
     }
 
     public static LoginController getLoginController() {
         return loginController;
     }
 
+    public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
+        this.loginFrame = loginFrame;
+        this.remoteWhiteBoard = remoteWhiteBoard;
+    }
+
+
+    /*========================================Advanced features========================================*/
     public void saveAs(File out) {
 
         try {
             ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", out);
-
-//            File outfile = new File("./data/Untitled" + System.currentTimeMillis() + ".png");
-//            ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", outfile);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
+        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+    }
+
+    public void createWhiteBoard() {
+        try {
+            SerializableBufferedImage canvas = new SerializableBufferedImage(300, 300);
+            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+            this.remoteWhiteBoard.create(canvas);
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -65,15 +78,6 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
 
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void kick(String username) {
-        try {
-
-            this.remoteWhiteBoard.kick(username);
-        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -98,15 +102,6 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             }
         }
     }
-
-    public void quit() {
-        try {
-            this.remoteWhiteBoard.quit(this.username);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void close() {
         try {
             this.remoteWhiteBoard.close(this.username);
@@ -116,16 +111,29 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         }
     }
 
-    public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
-        this.loginFrame = loginFrame;
-        this.remoteWhiteBoard = remoteWhiteBoard;
+
+    /*========================================WhiteBoard Management========================================*/
+    public void quit() {
+        try {
+            this.remoteWhiteBoard.quit(this.username);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void kick(String username) {
+        try {
+
+            this.remoteWhiteBoard.kick(username);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean join(String username) {
         try {
 
             // communicate with the Remote White board
-
             // if could join
             if (this.remoteWhiteBoard.join(username, this)) {
                 this.username = username;
@@ -138,22 +146,9 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
                     this.whiteBoardClientGUI.mb.setVisible(true);
                 }
 
-                // get user lists from remote
-//                System.out.println(this.remoteWhiteBoard.getUserList());
-
-                // add it to the frame
-//                ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
-//                for (String user : users_info) {
-//                    this.whiteBoardClientGUI.listModel.addElement(user);
-//                }
-
                 this.loginFrame.frame.dispose();
                 this.whiteBoardClientGUI.frame.setVisible(true);
             }
-
-//            else {
-//                JOptionPane.showMessageDialog(null, "The Name has already been taken!");
-//            }
 
             return true;
         } catch (RemoteException e) {
@@ -173,10 +168,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         // add it to the frame
         ArrayList<String> users_info = this.remoteWhiteBoard.getUserList();
         for (String user : users_info) {
-//            int index = this.whiteBoardClientGUI.userList.getNextMatch(user, 0, Position.Bias.Forward);
-//            if (index == -1) {
             this.whiteBoardClientGUI.listModel.addElement(user);
-//            }
         }
     }
 
@@ -205,16 +197,6 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         }).start();
     }
 
-    public void createWhiteBoard() {
-        try {
-            SerializableBufferedImage canvas = new SerializableBufferedImage(300, 300);
-            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
-            this.remoteWhiteBoard.create(canvas);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public boolean allowJoins(String username) throws RemoteException {
         int result = JOptionPane.showConfirmDialog(this.whiteBoardClientGUI.frame, username, "New user join request",
@@ -226,16 +208,16 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         return false;
     }
 
-    @Override
-    public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
-        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+    /*========================================WhiteBoard Drawing========================================*/
+
+    public void changeMode(Mode mode) {
+        this.whiteBoardClientGUI.canvas.setMode(mode);
+        System.out.println(mode); // TODO debug
     }
 
     @Override
     public void draw(MyPoint start, MyPoint end, Mode mode) throws RemoteException {
         this.whiteBoardClientGUI.canvas.requestFocusInWindow();
-//        this.whiteBoardClientGUI.canvas.drawLine(start, end, Color.BLACK, 1);
-//        canvas.drawLine(lastPoint, nextPoint, Color.orange, 1);
         this.whiteBoardClientGUI.canvas.lastPoint = start;
         this.whiteBoardClientGUI.canvas.firstPoint = end;
         this.whiteBoardClientGUI.canvas.fixed = true;
@@ -247,10 +229,6 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             case RECTANGLE:
                 this.whiteBoardClientGUI.canvas.drawRect(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
                 break;
-//            case TEXT:
-//                this.whiteBoardClientGUI.canvas.lastPoint = new MyPoint(10, 10);
-//                this.whiteBoardClientGUI.canvas.drawString('s');
-//                break;
             default:
                 System.out.println("not support");
         }
@@ -261,11 +239,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     @Override
     public void mouseClicked(MouseEvent e) {
 //        System.out.println("clicked");
-//        if (lastPoint == null) {
         lastPoint = new MyPoint(e.getPoint());
-//        } else {
-//            this.lastPoint = null;
-//        }
     }
 
     @Override
@@ -273,29 +247,18 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 //        System.out.println("pressed");
         this.whiteBoardClientGUI.canvas.fixed = false;
         this.whiteBoardClientGUI.canvas.lastPoint = new MyPoint(e.getPoint());
-//        this.lastPoint = new MyPoint(e.getPoint());
-//        this.whiteBoardClientGUI.canvas.repaint();
-
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
 //        System.out.println("released");
         try {
-//            System.out.println(String.format("Start: (%d, %d)", this.whiteBoardClientGUI.canvas.lastPoint.x, this.whiteBoardClientGUI.canvas.lastPoint.y));
-//            System.out.println(String.format("End: (%d, %d)", this.whiteBoardClientGUI.canvas.firstPoint.x, this.whiteBoardClientGUI.canvas.firstPoint.y));
             this.remoteWhiteBoard.draw(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
                     this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
             this.draw(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
         } catch (RemoteException ee) {
             ee.printStackTrace();
         }
-//        this.whiteBoardClientGUI.canvas.fixed = true;
-//        this.whiteBoardClientGUI.canvas.repaint();
-
-//        this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
-//        this.firstPoint = new MyPoint(e.getPoint());
-
     }
 
     @Override
@@ -313,24 +276,10 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 //        System.out.println("dragged");
         this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
         this.whiteBoardClientGUI.canvas.repaint();
-//        if (lastPoint == null) {
-//            lastPoint = new MyPoint(e.getPoint());
-//        } else {
-//            try {
-//                this.whiteBoardClientGUI.canvas.requestFocusInWindow();
-//                MyPoint nextPoint = new MyPoint(e.getPoint());
-//                this.drawLine(lastPoint, firstPoint);
-//                this.remoteWhiteBoard.drawLine(this.username, lastPoint, nextPoint);
-//                this.lastPoint = null;
-//            } catch (RemoteException ee) {
-//                ee.printStackTrace();
-//            }
-//        }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-//        System.out.println("Mouved");
     }
 
     @Override

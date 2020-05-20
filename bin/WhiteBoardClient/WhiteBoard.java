@@ -4,16 +4,30 @@ import WhiteBoardServer.SerializableBufferedImage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class WhiteBoard extends JPanel implements Serializable {
+    private Mode mode = Mode.LINE;
+
+
+    private BufferedImage canvas;
+
+    public MyPoint lastPoint, firstPoint;
+    public boolean fixed = false;
+
+    public WhiteBoard(int width, int length) {
+        this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    public WhiteBoard(BufferedImage canvas) {
+        this.canvas = canvas;
+    }
+    /*========================================Getters and Setters========================================*/
+    public BufferedImage getWhiteBoard() {
+        return this.canvas;
+    }
+
     public Mode getMode() {
         return mode;
     }
@@ -22,41 +36,7 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.mode = mode;
     }
 
-    private Mode mode = Mode.LINE;
-
-    public BufferedImage getCanvas() {
-        return canvas;
-    }
-
-    private BufferedImage canvas;
-    public MyPoint lastPoint, firstPoint;
-    public boolean fixed = false;
-
-
-    public WhiteBoard(int width, int length) {
-        this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
-//        drawLine();
-    }
-
-    public WhiteBoard(BufferedImage canvas) {
-        this.canvas = canvas;
-    }
-
-
-    public void drawLine() {
-
-        Graphics2D g = (Graphics2D) this.canvas.getGraphics();
-        g.drawLine(10, 10, 1000, 1000);
-        System.out.println("client asked to draw a line");
-//        try {
-//            TimeUnit.SECONDS.sleep(5);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-        this.repaint();
-    }
-
+    /*========================================Drawing features========================================*/
     public MyPoint drawLine(MyPoint start, MyPoint end, Color colour, int size) {
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
@@ -71,7 +51,6 @@ public class WhiteBoard extends JPanel implements Serializable {
 
         // setup the g for drawing
         g.setColor(col);
-//        g.setStroke(new BasicStroke(weight));
 
         // Draw a line
         synchronized (WhiteBoard.class) {
@@ -81,12 +60,10 @@ public class WhiteBoard extends JPanel implements Serializable {
         // render the line
         this.revalidate();
         this.repaint();
-//        System.out.println("draw line");
-        // return the end point
         return end;
     }
 
-    public void drawRect(MyPoint start, MyPoint end){
+    public void drawRect(MyPoint start, MyPoint end) {
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
 
@@ -104,14 +81,10 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.repaint();
     }
 
-    public void drawString(Character c){
-        Graphics2D g = (Graphics2D)canvas.getGraphics();
+    public void drawString(Character c) {
+        Graphics2D g = (Graphics2D) canvas.getGraphics();
         Font f = new Font("Serif", Font.PLAIN, 12);
         Color col = Color.BLACK;
-//        if (colour != null)
-//            col = colour;
-//        if (font != null)
-//            f = font;
 
         String text = String.valueOf(c);
         g.setColor(col);
@@ -121,22 +94,12 @@ public class WhiteBoard extends JPanel implements Serializable {
         }
         FontMetrics metrics = g.getFontMetrics();
 
-//        MyPoint nextPoint = new MyPoint(lastPoint.x, lastPoint.y);
         lastPoint.x += metrics.stringWidth(text);
 
         this.repaint();
-//        return MyPoint;
     }
 
-    public BufferedImage getWhiteBoard() {
-        return this.canvas;
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(canvas.getWidth(), canvas.getHeight());
-    }
-
+    /*========================================Enable Drag Drawing========================================*/
     /**
      * Paints the contents of the canvas to the JPane.
      *
@@ -156,9 +119,6 @@ public class WhiteBoard extends JPanel implements Serializable {
                     case RECTANGLE:
                         g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
                         break;
-                    case TEXT:
-                        g.drawString("string", 10 , 10);
-                        break;
                     default:
                         System.out.println("not support");
                 }
@@ -169,15 +129,10 @@ public class WhiteBoard extends JPanel implements Serializable {
 
                 switch (mode) {
                     case LINE:
-//                        g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
                         this.drawLine(lastPoint, firstPoint, Color.BLACK, 1);
                         break;
                     case RECTANGLE:
                         this.drawRect(lastPoint, firstPoint);
-//                        g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
-                        break;
-                    case TEXT:
-                        this.drawString('s');
                         break;
                     default:
                         System.out.println("not support");
@@ -191,10 +146,9 @@ public class WhiteBoard extends JPanel implements Serializable {
 
     }
 
-//    @Override
-//    public void paint(Graphics g) {
-//        super.paint(g);
-//        if (lastPoint != null && firstPoint != null)
-//            g.drawLine(lastPoint.x, lastPoint.y, firstPoint.x, firstPoint.y);
-//    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(canvas.getWidth(), canvas.getHeight());
+    }
 }
