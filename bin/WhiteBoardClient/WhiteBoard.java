@@ -104,6 +104,30 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.repaint();
     }
 
+    public void drawString(Character c){
+        Graphics2D g = (Graphics2D)canvas.getGraphics();
+        Font f = new Font("Serif", Font.PLAIN, 12);
+        Color col = Color.BLACK;
+//        if (colour != null)
+//            col = colour;
+//        if (font != null)
+//            f = font;
+
+        String text = String.valueOf(c);
+        g.setColor(col);
+        g.setFont(f);
+        synchronized (WhiteBoard.class) {
+            g.drawString(text, lastPoint.x, lastPoint.y);
+        }
+        FontMetrics metrics = g.getFontMetrics();
+
+//        MyPoint nextPoint = new MyPoint(lastPoint.x, lastPoint.y);
+        lastPoint.x += metrics.stringWidth(text);
+
+        this.repaint();
+//        return MyPoint;
+    }
+
     public BufferedImage getWhiteBoard() {
         return this.canvas;
     }
@@ -132,6 +156,9 @@ public class WhiteBoard extends JPanel implements Serializable {
                     case RECTANGLE:
                         g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
                         break;
+                    case TEXT:
+                        g.drawString("string", 10 , 10);
+                        break;
                     default:
                         System.out.println("not support");
                 }
@@ -148,6 +175,9 @@ public class WhiteBoard extends JPanel implements Serializable {
                     case RECTANGLE:
                         this.drawRect(lastPoint, firstPoint);
 //                        g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
+                        break;
+                    case TEXT:
+                        this.drawString('s');
                         break;
                     default:
                         System.out.println("not support");

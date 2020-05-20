@@ -6,9 +6,7 @@ import WhiteBoardServer.SerializableBufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class LoginController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener {
+public class LoginController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
     private static LoginController loginController;
     private String username;
     private boolean isManger = false;
@@ -249,6 +247,10 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             case RECTANGLE:
                 this.whiteBoardClientGUI.canvas.drawRect(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
                 break;
+//            case TEXT:
+//                this.whiteBoardClientGUI.canvas.lastPoint = new MyPoint(10, 10);
+//                this.whiteBoardClientGUI.canvas.drawString('s');
+//                break;
             default:
                 System.out.println("not support");
         }
@@ -260,7 +262,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     public void mouseClicked(MouseEvent e) {
 //        System.out.println("clicked");
 //        if (lastPoint == null) {
-//            lastPoint = new MyPoint(e.getPoint());
+        lastPoint = new MyPoint(e.getPoint());
 //        } else {
 //            this.lastPoint = null;
 //        }
@@ -282,7 +284,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         try {
 //            System.out.println(String.format("Start: (%d, %d)", this.whiteBoardClientGUI.canvas.lastPoint.x, this.whiteBoardClientGUI.canvas.lastPoint.y));
 //            System.out.println(String.format("End: (%d, %d)", this.whiteBoardClientGUI.canvas.firstPoint.x, this.whiteBoardClientGUI.canvas.firstPoint.y));
-            this.remoteWhiteBoard.drawLine(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
+            this.remoteWhiteBoard.draw(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
                     this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
             this.draw(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
         } catch (RemoteException ee) {
@@ -329,5 +331,25 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     @Override
     public void mouseMoved(MouseEvent e) {
 //        System.out.println("Mouved");
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (this.whiteBoardClientGUI.canvas.getMode().equals(Mode.TEXT)) {
+            System.out.println(e.getKeyChar());
+            this.whiteBoardClientGUI.canvas.drawString(e.getKeyChar());
+        }else {
+            System.out.println(whiteBoardClientGUI.canvas.getMode());
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }
