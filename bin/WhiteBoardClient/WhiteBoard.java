@@ -57,6 +57,10 @@ public class WhiteBoard extends JPanel implements Serializable {
             g.drawLine(start.x, start.y, end.x, end.y);
         }
 
+        if (this.mode == Mode.FREEHAND){
+            lastPoint = firstPoint;
+        }
+
         // render the line
         this.revalidate();
         this.repaint();
@@ -72,7 +76,7 @@ public class WhiteBoard extends JPanel implements Serializable {
         g.setColor(col);
         // Draw a line
         synchronized (WhiteBoard.class) {
-            System.out.println(String.format("start (%d, %d), end (%d , %d)", start.x, start.y, end.x, end.y));
+//            System.out.println(String.format("start (%d, %d), end (%d , %d)", start.x, start.y, end.x, end.y));
             g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
         }
 
@@ -138,9 +142,11 @@ public class WhiteBoard extends JPanel implements Serializable {
                         System.out.println("not support");
                 }
 
-                this.firstPoint = null;
-                this.lastPoint = null;
-                System.out.println("fixed");
+                if (this.getMode() != Mode.TEXT){
+                    this.firstPoint = null;
+                    this.lastPoint = null;
+                    System.out.println("fixed");
+                }
             }
         }
 
