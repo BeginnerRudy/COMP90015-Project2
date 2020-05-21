@@ -152,9 +152,6 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             case RECTANGLE:
                 g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
                 break;
-//            case TEXT:
-//                g.drawString("string", 10 , 10);
-//                break;
             default:
                 System.out.println("not support");
         }

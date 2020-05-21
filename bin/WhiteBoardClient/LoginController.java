@@ -218,6 +218,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         this.whiteBoardClientGUI.canvas.requestFocusInWindow();
         this.whiteBoardClientGUI.canvas.lastPoint = start;
         this.whiteBoardClientGUI.canvas.firstPoint = end;
+        this.whiteBoardClientGUI.canvas.setRemoteDraw(true);
         this.whiteBoardClientGUI.canvas.fixed = true;
 
         switch (mode) {
@@ -261,7 +262,11 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
                 this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
                 this.remoteWhiteBoard.draw(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
                         this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
-                this.draw(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
+//                this.draw(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
+
+                this.whiteBoardClientGUI.canvas.requestFocusInWindow();
+                this.whiteBoardClientGUI.canvas.fixed = true;
+                this.whiteBoardClientGUI.canvas.repaint();
             }
         } catch (RemoteException ee) {
             ee.printStackTrace();

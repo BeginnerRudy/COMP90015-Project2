@@ -14,9 +14,10 @@ public class WhiteBoard extends JPanel implements Serializable {
 
     private BufferedImage canvas;
 
+    private boolean remoteDraw = false;
+
     public MyPoint lastPoint, firstPoint;
     public boolean fixed = false;
-
     public WhiteBoard(int width, int length) {
         this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
     }
@@ -26,16 +27,20 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     private class PairOfPoints {
+
         MyPoint start;
         MyPoint end;
-
         PairOfPoints(MyPoint start, MyPoint end) {
             this.start = start;
             this.end = end;
         }
-    }
 
+    }
     /*========================================Getters and Setters========================================*/
+
+    public void setRemoteDraw(boolean remoteDraw) {
+        this.remoteDraw = remoteDraw;
+    }
     public BufferedImage getWhiteBoard() {
         return this.canvas;
     }
@@ -186,7 +191,8 @@ public class WhiteBoard extends JPanel implements Serializable {
         super.paintComponent(g);
         Graphics2D graphics = (Graphics2D) g.create();
         graphics.drawImage(canvas, 0, 0, Color.WHITE, null);
-        if (lastPoint != null && firstPoint != null) {
+//        System.out.println("drawn !!!!!!!!!!!!!!!");
+        if (!this.remoteDraw && lastPoint != null && firstPoint != null) {
             if (!fixed) {
                 switch (mode) {
                     case LINE:
@@ -238,6 +244,8 @@ public class WhiteBoard extends JPanel implements Serializable {
                     System.out.println("fixed");
                 }
             }
+        }else{
+            this.remoteDraw = false; // finish remote drawing
         }
 
     }
