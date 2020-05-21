@@ -179,6 +179,20 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.repaint();
     }
 
+    public void drawString(MyPoint start, Character c) {
+        Graphics2D g = (Graphics2D) canvas.getGraphics();
+        Font f = new Font("Serif", Font.PLAIN, 12);
+        Color col = Color.BLACK;
+
+        String text = String.valueOf(c);
+        g.setColor(col);
+        g.setFont(f);
+        synchronized (WhiteBoard.class) {
+            g.drawString(text, start.x, start.y);
+        }
+        this.repaint();
+    }
+
     /*========================================Enable Drag Drawing========================================*/
 
     /**

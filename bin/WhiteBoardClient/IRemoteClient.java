@@ -19,5 +19,6 @@ public interface IRemoteClient extends Remote {
     void closeGUI() throws RemoteException;
     boolean allowJoins(String username) throws RemoteException;
     void createCanvas(SerializableBufferedImage canvas) throws RemoteException;
-    void draw(MyPoint start, MyPoint end, Mode mode) throws RemoteException;
+    void drawShape(MyPoint start, MyPoint end, Mode mode) throws RemoteException;
+    void drawString(MyPoint start, Character c) throws RemoteException;
 }

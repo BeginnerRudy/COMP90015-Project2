@@ -44,7 +44,7 @@ public class WhiteBoardController extends JPanel
         }
 
         try{
-            remoteWhiteBoard.draw(this.username, new MyPoint(lastPoint.x, lastPoint.y), new MyPoint(nextPoint.x, nextPoint.y), this.canvas.getMode());
+            remoteWhiteBoard.drawShape(this.username, new MyPoint(lastPoint.x, lastPoint.y), new MyPoint(nextPoint.x, nextPoint.y), this.canvas.getMode());
         }catch (RemoteException e){
             e.printStackTrace();
         }

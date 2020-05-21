@@ -22,5 +22,6 @@ public interface IRemoteWhiteBoard extends Remote {
 
     ArrayList<String> getUserList() throws RemoteException;
 
-    void draw(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException;
+    void drawShape(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException;
+    void drawString(String username, MyPoint start, Character c) throws RemoteException;
 }

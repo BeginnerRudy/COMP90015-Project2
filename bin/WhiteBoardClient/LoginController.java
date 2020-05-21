@@ -206,15 +206,20 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         return false;
     }
 
-    /*========================================WhiteBoard Drawing========================================*/
 
+    /*========================================WhiteBoard Drawing========================================*/
     public void changeMode(Mode mode) {
         this.whiteBoardClientGUI.canvas.setMode(mode);
         System.out.println(mode); // TODO debug
     }
 
     @Override
-    public void draw(MyPoint start, MyPoint end, Mode mode) throws RemoteException {
+    public void drawString(MyPoint start, Character c) throws RemoteException {
+        this.whiteBoardClientGUI.canvas.drawString(start, c);
+    }
+
+    @Override
+    public void drawShape(MyPoint start, MyPoint end, Mode mode) throws RemoteException {
         this.whiteBoardClientGUI.canvas.requestFocusInWindow();
         this.whiteBoardClientGUI.canvas.lastPoint = start;
         this.whiteBoardClientGUI.canvas.firstPoint = end;
@@ -260,7 +265,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         try {
             if (this.whiteBoardClientGUI.canvas.getMode() != Mode.FREEHAND) {
                 this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
-                this.remoteWhiteBoard.draw(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
+                this.remoteWhiteBoard.drawShape(this.username, this.whiteBoardClientGUI.canvas.lastPoint,
                         this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
 //                this.draw(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
 
@@ -285,17 +290,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
     public void keyTyped(KeyEvent e) {
         System.out.println("typed");
         if (this.whiteBoardClientGUI.canvas.getMode().equals(Mode.TEXT)) {
-            System.out.println(e.getKeyChar());
-            if (this.whiteBoardClientGUI.canvas.lastPoint == null){
-                System.out.println("last point is null");
+            try {
+                this.remoteWhiteBoard.drawString(this.username, this.whiteBoardClientGUI.canvas.lastPoint, e.getKeyChar());
+                this.whiteBoardClientGUI.canvas.drawString(e.getKeyChar());
+            } catch (RemoteException ee) {
+                ee.printStackTrace();
             }
-
-            if (this.whiteBoardClientGUI.canvas.firstPoint == null){
-                System.out.println("first point is null");
-            }
-            this.whiteBoardClientGUI.canvas.drawString(e.getKeyChar());
-        } else {
-            System.out.println(whiteBoardClientGUI.canvas.getMode());
         }
     }
 
