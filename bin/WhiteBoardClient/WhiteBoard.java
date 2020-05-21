@@ -75,10 +75,42 @@ public class WhiteBoard extends JPanel implements Serializable {
         // set default color and weight
         Color col = Color.BLACK;
         g.setColor(col);
-        // Draw a line
+
+        MyPoint first = null;
+        MyPoint last = null;
+
+        System.out.println(String.format("start (%d, %d), end (%d, %d)", start.x, start.y, end.x, end.y));
+
+        if (start.x < end.x) {
+            // bottom right
+            if (start.y < end.y) {
+                first = start;
+                last = end;
+                System.out.println("bottom right");
+                // top right
+            } else {
+                first = new MyPoint(start.x, end.y);
+                last = new MyPoint(end.x, start.y);
+                System.out.println("top right");
+            }
+        } else {
+            // bottom left
+            if (start.y < end.y) {
+                first = new MyPoint(end.x, start.y);
+                last = new MyPoint(start.x, end.y);
+                System.out.println("bottom left");
+                // top left
+            } else {
+                first = end;
+                last = start;
+                System.out.println("top left");
+
+            }
+        }
+
         synchronized (WhiteBoard.class) {
-//            System.out.println(String.format("start (%d, %d), end (%d , %d)", start.x, start.y, end.x, end.y));
-            g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
+            System.out.println(String.format("x: %d, y: %d, width: %d, height: %d", first.x, first.y, last.x - first.x, last.y - first.y));
+            g.drawRect(first.x, first.y, last.x - first.x, last.y - first.y);
         }
 
         // render the line
@@ -87,6 +119,7 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     private int getRadius(MyPoint start, MyPoint end) {
+        // TODO how to make the radius to cross both start and end
         return (int) Math.sqrt(Math.pow(Math.abs(start.x - end.x), 2) + Math.pow(Math.abs(start.x - end.x), 2));
     }
 
@@ -98,12 +131,11 @@ public class WhiteBoard extends JPanel implements Serializable {
         g.setColor(col);
         g.setFont(f);
 
+
         int radius = getRadius(start, end);
         synchronized (WhiteBoard.class) {
             g.drawOval(start.x, start.y, radius, radius);
         }
-        FontMetrics metrics = g.getFontMetrics();
-
         this.repaint();
     }
 
