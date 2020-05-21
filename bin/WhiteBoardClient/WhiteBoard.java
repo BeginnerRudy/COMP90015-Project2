@@ -25,6 +25,16 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.canvas = canvas;
     }
 
+    private class PairOfPoints {
+        MyPoint start;
+        MyPoint end;
+
+        PairOfPoints(MyPoint start, MyPoint end) {
+            this.start = start;
+            this.end = end;
+        }
+    }
+
     /*========================================Getters and Setters========================================*/
     public BufferedImage getWhiteBoard() {
         return this.canvas;
@@ -68,18 +78,9 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.repaint();
     }
 
-    public void drawRect(MyPoint start, MyPoint end) {
-        this.requestFocusInWindow();
-        Graphics2D g = (Graphics2D) this.canvas.getGraphics();
-
-        // set default color and weight
-        Color col = Color.BLACK;
-        g.setColor(col);
-
-        MyPoint first = null;
-        MyPoint last = null;
-
-        System.out.println(String.format("start (%d, %d), end (%d, %d)", start.x, start.y, end.x, end.y));
+    private PairOfPoints getCorrectPoints(MyPoint start, MyPoint end) {
+        MyPoint first;
+        MyPoint last;
 
         if (start.x < end.x) {
             // bottom right
@@ -107,9 +108,23 @@ public class WhiteBoard extends JPanel implements Serializable {
 
             }
         }
+        return new PairOfPoints(first, last);
+    }
+
+    public void drawRect(MyPoint start, MyPoint end) {
+        this.requestFocusInWindow();
+        Graphics2D g = (Graphics2D) this.canvas.getGraphics();
+
+        // set default color and weight
+        Color col = Color.BLACK;
+        g.setColor(col);
+
+        PairOfPoints pairOfPoints = getCorrectPoints(start, end);
+
+        MyPoint first = pairOfPoints.start;
+        MyPoint last = pairOfPoints.end;
 
         synchronized (WhiteBoard.class) {
-            System.out.println(String.format("x: %d, y: %d, width: %d, height: %d", first.x, first.y, last.x - first.x, last.y - first.y));
             g.drawRect(first.x, first.y, last.x - first.x, last.y - first.y);
         }
 
@@ -179,7 +194,11 @@ public class WhiteBoard extends JPanel implements Serializable {
                         break;
                     case RECTANGLE:
                         synchronized (WhiteBoard.class) {
-                            g.drawRect(lastPoint.x, lastPoint.y, firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y);
+                            PairOfPoints pairOfPoints = getCorrectPoints(lastPoint, firstPoint);
+
+                            MyPoint start = pairOfPoints.start;
+                            MyPoint end = pairOfPoints.end;
+                            g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
                         }
                         break;
                     case CIRCLE:
