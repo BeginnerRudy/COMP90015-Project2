@@ -141,28 +141,29 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     @Override
     public synchronized void draw(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException {
-//        System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
-//        System.out.println(String.format("End: (%d, %d)", end.x, end.y));
-//        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
-//        g.setColor(Color.BLACK);
-//        switch (mode) {
-//            case LINE:
-//                g.drawLine(start.x, start.y, end.x, end.y);
-//                break;
-//            case RECTANGLE:
-//                g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
-//                break;
+        System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
+        System.out.println(String.format("End: (%d, %d)", end.x, end.y));
+        Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
+        g.setColor(Color.BLACK);
+        switch (mode) {
+            case LINE:
+                g.drawLine(start.x, start.y, end.x, end.y);
+                break;
+            case RECTANGLE:
+                g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
+                break;
 //            case TEXT:
 //                g.drawString("string", 10 , 10);
 //                break;
-//            default:
-//                System.out.println("not support");
-//        }
-//        for (String user : users.keySet()) {
-//            if (!user.equals(username)) {
-//                this.users.get(user).draw(start, end, mode);
-//            }
-//        }
+            default:
+                System.out.println("not support");
+        }
+        for (String user : users.keySet()) {
+            if (!user.equals(username)) {
+                if (mode != Mode.FREEHAND && mode != Mode.TEXT)
+                    this.users.get(user).draw(start, end, mode);
+            }
+        }
     }
 
 

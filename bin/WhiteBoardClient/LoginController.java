@@ -227,11 +227,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
             case RECTANGLE:
                 this.whiteBoardClientGUI.canvas.drawRect(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
                 break;
+            case CIRCLE:
+                this.whiteBoardClientGUI.canvas.drawCircle(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint);
+                break;
             default:
                 System.out.println("not support");
         }
-
-        this.whiteBoardClientGUI.canvas.repaint();
     }
 
     @Override

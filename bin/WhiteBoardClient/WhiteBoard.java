@@ -146,10 +146,12 @@ public class WhiteBoard extends JPanel implements Serializable {
         g.setColor(col);
         g.setFont(f);
 
+        MyPoint first = getCorrectPoints(start, end).start;
+
 
         int radius = getRadius(start, end);
         synchronized (WhiteBoard.class) {
-            g.drawOval(start.x, start.y, radius, radius);
+            g.drawOval(first.x, first.y, radius, radius);
         }
         this.repaint();
     }
@@ -203,9 +205,11 @@ public class WhiteBoard extends JPanel implements Serializable {
                         break;
                     case CIRCLE:
                         int radius = getRadius(lastPoint, firstPoint);
+                        MyPoint start = getCorrectPoints(lastPoint, firstPoint).start;
                         synchronized (WhiteBoard.class) {
-                            g.drawOval(lastPoint.x, lastPoint.y, radius, radius);
+                            g.drawOval(start.x, start.y, radius, radius);
                         }
+                        break;
                     default:
                         System.out.println("not support");
                 }
@@ -223,6 +227,7 @@ public class WhiteBoard extends JPanel implements Serializable {
                         break;
                     case CIRCLE:
                         this.drawCircle(lastPoint, firstPoint);
+                        break;
                     default:
                         System.out.println("not support");
                 }
