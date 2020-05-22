@@ -4,12 +4,15 @@ import RemoteInterface.IRemoteWhiteBoard;
 import WhiteBoardClient.IRemoteClient;
 import WhiteBoardClient.Mode;
 import WhiteBoardClient.MyPoint;
+import WhiteBoardClient.Util;
 
 import java.awt.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static WhiteBoardClient.Util.getRadius;
 
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
     private ConcurrentHashMap<String, IRemoteClient> users = new ConcurrentHashMap<>(); // stores a hash map between username and its remote interface
@@ -146,17 +149,28 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         g.setColor(Color.BLACK);
         switch (mode) {
             case LINE:
+            case FREEHAND:
                 g.drawLine(start.x, start.y, end.x, end.y);
                 break;
-            case RECTANGLE:
+            case RECTANGLE: // TODO calculate the correct point
+                Util.PairOfPoints pairOfPoints = Util.getCorrectPoints(start, end);
+
+                start = pairOfPoints.start;
+                end = pairOfPoints.end;
                 g.drawRect(start.x, start.y, end.x - start.x, end.y - start.y);
                 break;
+            case CIRCLE:
+                int radius = getRadius(start, end);
+                pairOfPoints = Util.getCorrectPoints(start, end);
+                start = pairOfPoints.start;
+                end = pairOfPoints.end;
+                g.drawOval(start.x, start.y, radius, radius);
             default:
                 System.out.println("not support");
         }
         for (String user : users.keySet()) {
             if (!user.equals(username)) {
-                if (mode != Mode.FREEHAND && mode != Mode.TEXT)
+                if (mode != Mode.TEXT)
                     this.users.get(user).drawShape(start, end, mode);
             }
         }

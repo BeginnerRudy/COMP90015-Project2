@@ -228,6 +228,7 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
         switch (mode) {
             case LINE:
+            case FREEHAND:
                 this.whiteBoardClientGUI.canvas.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, Color.BLACK, 1);
                 break;
             case RECTANGLE:
@@ -255,7 +256,12 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
         if (this.whiteBoardClientGUI.canvas.getMode() != Mode.FREEHAND) {
             this.whiteBoardClientGUI.canvas.repaint();
         } else {
-            this.whiteBoardClientGUI.canvas.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, Color.BLACK, 1);
+            try {
+                this.remoteWhiteBoard.drawShape(this.username, this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
+                this.whiteBoardClientGUI.canvas.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, Color.BLACK, 1);
+            } catch (RemoteException ee){
+                ee.printStackTrace();
+            }
         }
     }
 
