@@ -73,7 +73,7 @@ public class WhiteBoardClientGUI {
         panel.setLayout(null);
         panel.setBounds(0, 0, 900, 900);
 
-        int width =  130;
+        int width = 130;
 
         // 'Join WhiteBoard' button
         closeWhiteBoardButton = new JButton("Close");
@@ -119,7 +119,6 @@ public class WhiteBoardClientGUI {
         scrollPaneForStatus.setViewportView(userList);
 
 
-
         // Add menu bar
         // create a menubar
         mb = new JMenuBar();
@@ -145,16 +144,22 @@ public class WhiteBoardClientGUI {
             //TODO implement file type and check whether there is already a whiteboard
 
             System.out.println("Click on Save as");
-            JFileChooser j = new JFileChooser("./data/");
-            j.showDialog(this.frame, "Save as");
-            j.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            if (this.canvas != null) {
+                JFileChooser j = new JFileChooser("./data/");
+                j.showDialog(this.frame, "Save as");
+                j.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 //            String filename = "d.png";
-            File file = j.getSelectedFile();
-            if (file == null) {
-                System.out.println("no file selected");
-                return;
+                File file = j.getSelectedFile();
+                if (file == null) {
+                    System.out.println("no file selected");
+                    return;
+                }
+                ClientController.getClientController().saveAs(file);
+            } else {
+                JOptionPane.showMessageDialog(this.frame, "Please create a whiteboard first!");
             }
-            ClientController.getClientController().saveAs(file);
+
+
         });
 
         m3.addActionListener(e -> {
@@ -244,7 +249,7 @@ public class WhiteBoardClientGUI {
         this.modeSelect.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == 1){
+                if (e.getStateChange() == 1) {
                     ClientController.getClientController().changeMode((Mode) e.getItem());
                 }
             }
@@ -252,7 +257,6 @@ public class WhiteBoardClientGUI {
 
         this.modeSelect.setBounds(410, 10, 108, 25);
         panel.add(this.modeSelect);
-
 
 
         this.canvas.addMouseListener(ClientController.getClientController());

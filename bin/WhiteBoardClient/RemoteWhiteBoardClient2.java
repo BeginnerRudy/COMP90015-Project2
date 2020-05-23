@@ -28,7 +28,7 @@ public class RemoteWhiteBoardClient2 {
             WhiteBoardLoginFrame whiteBoardLoginFrame = new WhiteBoardLoginFrame();
             whiteBoardLoginFrame.frame.setVisible(true);
 
-            ClientController.getClientController().init(whiteBoardLoginFrame, remoteWhiteBoard);
+            ClientController.getClientController().init(whiteBoardLoginFrame);
 
 
 

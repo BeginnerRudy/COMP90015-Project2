@@ -5,6 +5,7 @@ import WhiteBoardClient.ClientController;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.security.spec.ECField;
 
 public class WhiteBoardLoginFrame {
     public JFrame frame;
@@ -34,10 +35,10 @@ public class WhiteBoardLoginFrame {
         int port_textFiled_y = 75;
 
         // set icon
-        JLabel icon =new JLabel();
+        JLabel icon = new JLabel();
         icon.setText("Shared Canvas");
 //        icon.setIcon(new ImageIcon(this.getClass().getResource("/home/rudy/Code/Distributed-Computing/Distributed-Whiteboard/bin/whiteboard.jpg")));
-        icon.setBounds(textField_x+35, port_textFiled_y - textField_y_gap, 120, 33);
+        icon.setBounds(textField_x + 35, port_textFiled_y - textField_y_gap, 120, 33);
         panel.add(icon);
 
         // The prompt label for port
@@ -48,7 +49,7 @@ public class WhiteBoardLoginFrame {
 
         // Enter dialogue textField
         JTextField port = new JTextField();
-        port.setBounds(textField_x , port_textFiled_y, 181, 32);
+        port.setBounds(textField_x, port_textFiled_y, 181, 32);
         panel.add(port);
         port.setColumns(10);
 
@@ -60,21 +61,32 @@ public class WhiteBoardLoginFrame {
 
         // Enter dialogue textField
         JTextField username = new JTextField();
-        username.setBounds(textField_x , port_textFiled_y + textField_y_gap, 181, 32);
+        username.setBounds(textField_x, port_textFiled_y + textField_y_gap, 181, 32);
         panel.add(username);
         username.setColumns(10);
         // -----------------------------------------------------
 
 //         'send' button
         JButton btnJoin = new JButton("Join ");
-        btnJoin.setBounds(textField_x+55, port_textFiled_y + textField_y_gap*2, 69, 33);
+        btnJoin.setBounds(textField_x + 55, port_textFiled_y + textField_y_gap * 2, 69, 33);
         panel.add(btnJoin);
 
 
         btnJoin.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                ClientController.getClientController().join(username.getText());
+                int portNum;
+                if (username.getText() == null || username.getText().equals("")) {
+                    JOptionPane.showMessageDialog(frame, "Please enter null empty username!");
+
+                } else {
+                    try {
+                        portNum = Integer.parseInt(port.getText());
+                        ClientController.getClientController().join(username.getText(), portNum);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(frame, "Please enter integer for port number!");
+                    }
+                }
             }
         });
 

@@ -15,7 +15,10 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
@@ -46,32 +49,42 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         return clientController;
     }
 
-    public void init(WhiteBoardLoginFrame whiteBoardLoginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
+    public void init(WhiteBoardLoginFrame whiteBoardLoginFrame) {
         this.whiteBoardLoginFrame = whiteBoardLoginFrame;
-        this.remoteWhiteBoard = remoteWhiteBoard;
     }
 
 
     /*========================================Advanced features========================================*/
     public void saveAs(File out) {
+        if (this.whiteBoardClientGUI.canvas != null) {
 
-        try {
-            ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", out);
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", out);
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Successful!");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
-        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
+        if (this.whiteBoardClientGUI.canvas == null) {
+            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
+        } else {
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
+        }
     }
 
     public void createWhiteBoard() {
         try {
-            SerializableBufferedImage canvas = new SerializableBufferedImage(WHITEBOARD_WIDTH, WHITEBOARD_HEIGHT);
-            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
-            this.remoteWhiteBoard.create(canvas);
+            if (this.whiteBoardClientGUI.canvas == null) {
+                SerializableBufferedImage canvas = new SerializableBufferedImage(WHITEBOARD_WIDTH, WHITEBOARD_HEIGHT);
+                this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
+                this.remoteWhiteBoard.create(canvas);
+            } else {
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -80,9 +93,13 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     public void open(File canvas) {
         //TODO could the manger open or create more than one whiteboard at one time ?
         try {
-            BufferedImage imageOnDisk = ImageIO.read(canvas);
-            this.whiteBoardClientGUI.createCanvas(imageOnDisk);
-            this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
+            if (this.whiteBoardClientGUI.canvas == null) {
+                BufferedImage imageOnDisk = ImageIO.read(canvas);
+                this.whiteBoardClientGUI.createCanvas(imageOnDisk);
+                this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
+            } else {
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,21 +107,17 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
     public void save() {
-        if (this.whiteBoardClientGUI.canvas.getWhiteBoard() != null) {
+        if (this.whiteBoardClientGUI.canvas != null) {
             try {
-                File outfile = new File("./data/Untitled" + System.currentTimeMillis() + ".png");
+                File outfile = new File("./data/Untitled" + ".png");
                 ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", outfile);
-
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Saved as Untitled.png.");
             } catch (IOException ee) {
                 // handle exception
                 ee.printStackTrace();
             }
         } else {
-            try {
-                this.say("No whiteboard to save, please create one first");
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Please create a whiteboard first!");
         }
     }
 
@@ -130,17 +143,24 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
     public void kick(String username) {
-        try {
-            // Manager cannot kick itself
-            this.remoteWhiteBoard.kick(username);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        if (!username.equals(this.username)){
+            try {
+                // Manager cannot kick itself
+                this.remoteWhiteBoard.kick(username);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }else{
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You cannot kick yourself!");
         }
+
     }
 
-    public boolean join(String username) {
+    public boolean join(String username, int port) {
         try {
-
+            Registry registry = LocateRegistry.getRegistry("localhost", port);
+            IRemoteWhiteBoard remoteWhiteBoard = (IRemoteWhiteBoard) registry.lookup("WhiteBoard");
+            this.remoteWhiteBoard = remoteWhiteBoard;
             // communicate with the Remote White board
             // if could join
             if (this.remoteWhiteBoard.join(username, this)) {
@@ -160,7 +180,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
             return true;
         } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
             e.printStackTrace();
+        } catch ( NotBoundException e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
         }
         return false;
     }
@@ -270,7 +294,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             try {
                 this.remoteWhiteBoard.drawShape(this.username, this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
                 this.whiteBoardClientGUI.canvas.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, Color.BLACK, 1);
-            } catch (RemoteException ee){
+            } catch (RemoteException ee) {
                 ee.printStackTrace();
             }
         }
