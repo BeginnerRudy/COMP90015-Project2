@@ -10,10 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.swing.*;
 
-/**
- * @author Chaoxian Zhou, Yangyang Long, Jiuzhou Han, Wentao Yan
- * @date 19/10/2019
- */
 public class WhiteBoardClientGUI {
 
     public static void main(String[] args) {

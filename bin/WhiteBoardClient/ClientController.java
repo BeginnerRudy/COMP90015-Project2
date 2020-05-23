@@ -2,7 +2,7 @@ package WhiteBoardClient;
 
 import Utils.Mode;
 import Utils.MyPoint;
-import WhiteBoardClient.GUI.LoginFrame;
+import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
 import WhiteBoardClient.GUI.WhiteBoardClientGUI;
 import WhiteBoardServer.IRemoteWhiteBoard;
 import Utils.SerializableBufferedImage;
@@ -22,7 +22,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     private static ClientController clientController;
     private String username;
     private boolean isManger = false;
-    private LoginFrame loginFrame;
+    private WhiteBoardLoginFrame whiteBoardLoginFrame;
     private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
     private IRemoteWhiteBoard remoteWhiteBoard;
 
@@ -42,8 +42,8 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         return clientController;
     }
 
-    public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
-        this.loginFrame = loginFrame;
+    public void init(WhiteBoardLoginFrame whiteBoardLoginFrame, IRemoteWhiteBoard remoteWhiteBoard) {
+        this.whiteBoardLoginFrame = whiteBoardLoginFrame;
         this.remoteWhiteBoard = remoteWhiteBoard;
     }
 
@@ -148,7 +148,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                     this.whiteBoardClientGUI.mb.setVisible(true);
                 }
 
-                this.loginFrame.frame.dispose();
+                this.whiteBoardLoginFrame.frame.dispose();
                 this.whiteBoardClientGUI.frame.setVisible(true);
             }
 

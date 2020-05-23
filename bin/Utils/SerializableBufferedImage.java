@@ -29,18 +29,4 @@ public class SerializableBufferedImage implements Serializable {
             throws IOException, ClassNotFoundException {
         this.canvas = ImageIO.read(stream);
     }
-
-
-//    public String toString() {
-//        return name + "\t" + id + "\t" + DOB + "\t";
-//    }
-
-
-//    public SerializableBufferedImage(int width, int height, int imageType, IndexColorModel cm) {
-//        super(width, height, imageType, cm);
-//    }
-//
-//    public SerializableBufferedImage(ColorModel cm, WritableRaster raster, boolean isRasterPremultiplied, Hashtable<?, ?> properties) {
-//        super(cm, raster, isRasterPremultiplied, properties);
-//    }
 }
