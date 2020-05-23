@@ -2,7 +2,6 @@ package WhiteBoardClient;
 
 import Utils.Mode;
 import Utils.MyPoint;
-import Utils.Util;
 import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
 import WhiteBoardClient.GUI.WhiteBoardClientGUI;
 import WhiteBoardServer.IRemoteWhiteBoard;
@@ -28,12 +27,14 @@ import static Utils.Util.WHITEBOARD_WIDTH;
 public class ClientController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
     private static ClientController clientController;
     private String username;
-    private boolean isManger = false;
+
+    private boolean isManager = false;
+
     private WhiteBoardLoginFrame whiteBoardLoginFrame;
+
     private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
+
     private IRemoteWhiteBoard remoteWhiteBoard;
-
-
     static {
         try {
             clientController = new ClientController();
@@ -54,7 +55,12 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
 
+
     /*========================================Advanced features========================================*/
+    public boolean isManager() {
+        return isManager;
+    }
+
     public void saveAs(File out) {
         if (this.whiteBoardClientGUI.canvas != null) {
 
@@ -66,7 +72,6 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             }
         }
     }
-
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
         if (this.whiteBoardClientGUI.canvas == null) {
@@ -167,7 +172,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 this.username = username;
 
                 // show manager options
-                if (isManger) {
+                if (isManager) {
                     this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
                     this.whiteBoardClientGUI.kickButton.setVisible(true);
                     this.whiteBoardClientGUI.createBtn.setVisible(true);
@@ -216,7 +221,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     @Override
     public void setToBeManager() throws RemoteException {
-        this.isManger = true;
+        this.isManager = true;
     }
 
     @Override

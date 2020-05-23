@@ -224,7 +224,21 @@ public class WhiteBoardClientGUI {
             }
         });
 
-//        createCanvas(new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB));
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(frame,
+                        "Are you sure you want to close this whiteboard?", "Close Window?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+                    if (ClientController.getClientController().isManager()){
+                        ClientController.getClientController().close();
+                    }else {
+                        ClientController.getClientController().quit();
+                    }
+                }
+            }
+        });
     }
 
     public void createCanvas(BufferedImage canvas) {
