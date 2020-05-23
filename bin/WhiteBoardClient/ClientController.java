@@ -2,6 +2,7 @@ package WhiteBoardClient;
 
 import Utils.Mode;
 import Utils.MyPoint;
+import Utils.Util;
 import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
 import WhiteBoardClient.GUI.WhiteBoardClientGUI;
 import WhiteBoardServer.IRemoteWhiteBoard;
@@ -17,6 +18,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+
+import static Utils.Util.WHITEBOARD_HEIGHT;
+import static Utils.Util.WHITEBOARD_WIDTH;
 
 public class ClientController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
     private static ClientController clientController;
@@ -60,13 +64,13 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
-        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+        this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
     }
 
     public void createWhiteBoard() {
         try {
-            SerializableBufferedImage canvas = new SerializableBufferedImage(300, 300);
-            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard(), remoteWhiteBoard, this.username);
+            SerializableBufferedImage canvas = new SerializableBufferedImage(WHITEBOARD_WIDTH, WHITEBOARD_HEIGHT);
+            this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
             this.remoteWhiteBoard.create(canvas);
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -77,7 +81,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         //TODO could the manger open or create more than one whiteboard at one time ?
         try {
             BufferedImage imageOnDisk = ImageIO.read(canvas);
-            this.whiteBoardClientGUI.createCanvas(imageOnDisk, remoteWhiteBoard, this.username);
+            this.whiteBoardClientGUI.createCanvas(imageOnDisk);
             this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
 
         } catch (IOException e) {
@@ -117,7 +121,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     /*========================================WhiteBoard Management========================================*/
     public void quit() {
         try {
+            // TODO quit not functionally correct.
             this.remoteWhiteBoard.quit(this.username);
+            this.closeGUI();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -125,7 +131,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     public void kick(String username) {
         try {
-
+            // Manager cannot kick itself
             this.remoteWhiteBoard.kick(username);
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -219,6 +225,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     @Override
     public void drawString(MyPoint start, Character c) throws RemoteException {
+        this.whiteBoardClientGUI.canvas.setRemoteDraw(true);
         this.whiteBoardClientGUI.canvas.drawString(start, c);
     }
 

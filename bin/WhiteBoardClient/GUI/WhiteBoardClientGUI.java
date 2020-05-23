@@ -10,6 +10,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.swing.*;
 
+import static Utils.Util.WHITEBOARD_HEIGHT;
+import static Utils.Util.WHITEBOARD_WIDTH;
+
 public class WhiteBoardClientGUI {
 
     public static void main(String[] args) {
@@ -62,22 +65,51 @@ public class WhiteBoardClientGUI {
         frame = new JFrame();
 
         this.frame.setSize(900, 900);
-        frame.setLayout(new BorderLayout());
+        frame.getContentPane().setLayout(null);
         frame.setTitle("Client Whiteboard ");
 
         // Initialize the panel
         panel = new JPanel();
-        panel.setBounds(0, 0, 300, 600);
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 900, 900);
 
-        // Initialize the title of the frame
-        titleOfFrame = new JLabel("Client GUI DEMO");
-        titleOfFrame.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        titleOfFrame.setBounds(26, 15, 219, 34);
-        panel.add(titleOfFrame);
+        int width =  130;
+
+        // 'Join WhiteBoard' button
+        closeWhiteBoardButton = new JButton("Close");
+        closeWhiteBoardButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        closeWhiteBoardButton.setBounds(25, 56, width, 29);
+        panel.add(closeWhiteBoardButton);
+        closeWhiteBoardButton.setVisible(false);
+        // 'Clear Board' button
+        quitBoardContentButton = new JButton("Quit");
+        quitBoardContentButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        quitBoardContentButton.setBounds(26, 100, width, 29);
+        panel.add(quitBoardContentButton);
+
+        // 'Clear Board' button
+        kickButton = new JButton("Kick");
+        kickButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        kickButton.setBounds(26, 144, width, 29);
+        panel.add(kickButton);
+        kickButton.setVisible(false);
+
+        // 'Clear Board' button
+        createBtn = new JButton("Create");
+        createBtn.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        createBtn.setBounds(26, 188, width, 29);
+        panel.add(createBtn);
+        createBtn.setVisible(false);
+
+
+        userListTitle = new JLabel("User List");
+        userListTitle.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+        userListTitle.setBounds(26, 220, width, 34);
+        panel.add(userListTitle);
 
         // Initialize the scroll bar for user list
         scrollPaneForStatus = new JScrollPane();
-        scrollPaneForStatus.setBounds(26, 240, 208, 289);
+        scrollPaneForStatus.setBounds(26, 270, width, 289);
         panel.add(scrollPaneForStatus);
 
         // User list
@@ -86,37 +118,6 @@ public class WhiteBoardClientGUI {
         userList.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
         scrollPaneForStatus.setViewportView(userList);
 
-
-        userListTitle = new JLabel("User List");
-        userListTitle.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        userListTitle.setBounds(26, 191, 219, 34);
-        panel.add(userListTitle);
-
-        // 'Join WhiteBoard' button
-        closeWhiteBoardButton = new JButton("Close WhiteBoard");
-        closeWhiteBoardButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        closeWhiteBoardButton.setBounds(25, 56, 209, 29);
-        panel.add(closeWhiteBoardButton);
-        closeWhiteBoardButton.setVisible(false);
-        // 'Clear Board' button
-        quitBoardContentButton = new JButton("Quit Board");
-        quitBoardContentButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        quitBoardContentButton.setBounds(26, 100, 208, 29);
-        panel.add(quitBoardContentButton);
-
-        // 'Clear Board' button
-        kickButton = new JButton("Kick");
-        kickButton.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        kickButton.setBounds(26, 144, 208, 29);
-        panel.add(kickButton);
-        kickButton.setVisible(false);
-
-        // 'Clear Board' button
-        createBtn = new JButton("Create");
-        createBtn.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-        createBtn.setBounds(26, 188, 208, 29);
-        panel.add(createBtn);
-        createBtn.setVisible(false);
 
 
         // Add menu bar
@@ -189,7 +190,7 @@ public class WhiteBoardClientGUI {
         mb.setVisible(false);
 
 
-        frame.getContentPane().add(panel, BorderLayout.NORTH);
+        frame.getContentPane().add(panel);
 
 
         quitBoardContentButton.addMouseListener(new MouseAdapter() {
@@ -224,16 +225,19 @@ public class WhiteBoardClientGUI {
                 ClientController.getClientController().createWhiteBoard();
             }
         });
+
+//        createCanvas(new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB));
     }
 
-    public void createCanvas(BufferedImage canvas, IRemoteWhiteBoard remoteWhiteBoard, String username) {
+    public void createCanvas(BufferedImage canvas) {
         //        Container contentPane = this.frame.getContentPane();
-        JPanel c = new JPanel();
+//        JPanel c = new JPanel();
+//        c.setLayout(null);
+//        c.setBounds(300, 0, 300, 600);
 
         this.canvas = new WhiteBoard(canvas);
         this.modeSelect = new JComboBox<>(Mode.values());
         this.modeSelect.setEditable(false);
-//        whiteBoardController = new WhiteBoardController(this.canvas, remoteWhiteBoard, username);
 
         this.scroller = new JScrollPane(this.canvas);
         this.scroller.setBackground(Color.LIGHT_GRAY);
@@ -246,7 +250,9 @@ public class WhiteBoardClientGUI {
             }
         });
 
-        c.add(this.modeSelect);
+        this.modeSelect.setBounds(410, 10, 108, 25);
+        panel.add(this.modeSelect);
+
 
 
         this.canvas.addMouseListener(ClientController.getClientController());
@@ -254,8 +260,11 @@ public class WhiteBoardClientGUI {
         this.canvas.addKeyListener(ClientController.getClientController());
         // Add the canvas and controls to the main GUI. Canvas above controls.
 //        c.add(whiteBoardController);
-        c.add(scroller);
-        this.frame.getContentPane().add(c, BorderLayout.WEST);
+        this.scroller.setBounds(180, 50, 720, 850);
+        panel.add(scroller);
+//        this.frame.getContentPane().add(c);
+        this.panel.revalidate();
+        this.panel.repaint();
         this.frame.getContentPane().revalidate();
         this.frame.getContentPane().repaint();
     }

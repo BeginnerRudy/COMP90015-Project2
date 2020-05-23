@@ -1,6 +1,8 @@
 package Utils;
 
 public class Util {
+    public static final int WHITEBOARD_WIDTH = 720;
+    public static final int WHITEBOARD_HEIGHT = 830;
     public static class PairOfPoints {
 
         public MyPoint start;
