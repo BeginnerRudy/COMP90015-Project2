@@ -125,14 +125,11 @@ public class WhiteBoardClientGUI {
 
         // create a menu
         JMenu x = new JMenu("Menu");
-        JMenu x1 = new JMenu("submenu");
 
         // create menuitems
         JMenuItem m1 = new JMenuItem("Save");
         JMenuItem m2 = new JMenuItem("Save As");
         JMenuItem m3 = new JMenuItem("Open");
-        JMenuItem s1 = new JMenuItem("SubMenuItem1");
-        JMenuItem s2 = new JMenuItem("SubMenuItem2");
 
         // add ActionListener to menuItems
         m1.addActionListener(e -> {
@@ -181,11 +178,7 @@ public class WhiteBoardClientGUI {
         x.add(m1);
         x.add(m2);
         x.add(m3);
-        x1.add(s1);
-        x1.add(s2);
 
-        // add submenu
-        x.add(x1);
 
         // add menu to menu bar
         mb.add(x);
