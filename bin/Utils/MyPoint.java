@@ -1,4 +1,4 @@
-package WhiteBoardClient;
+package Utils;
 
 import java.awt.*;
 import java.io.Serializable;

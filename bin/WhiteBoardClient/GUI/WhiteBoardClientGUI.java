@@ -1,15 +1,14 @@
-package WhiteBoardClient;
+package WhiteBoardClient.GUI;
 
-import RemoteInterface.IRemoteWhiteBoard;
+import Utils.Mode;
+import WhiteBoardClient.ClientController;
+import WhiteBoardServer.IRemoteWhiteBoard;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
 
 /**
  * @author Chaoxian Zhou, Yangyang Long, Jiuzhou Han, Wentao Yan
@@ -43,7 +42,7 @@ public class WhiteBoardClientGUI {
     public WhiteBoard canvas;
     //    WhiteBoardController whiteBoardController;
     JScrollPane scroller;
-    JButton createBtn;
+    public JButton createBtn;
 
     // Drawing mode selector.
     public JComboBox<Mode> modeSelect;
@@ -142,7 +141,7 @@ public class WhiteBoardClientGUI {
         // add ActionListener to menuItems
         m1.addActionListener(e -> {
             System.out.println("Click on save");
-            LoginController.getLoginController().save();
+            ClientController.getClientController().save();
         });
 
         m2.addActionListener(e -> {
@@ -158,7 +157,7 @@ public class WhiteBoardClientGUI {
                 System.out.println("no file selected");
                 return;
             }
-            LoginController.getLoginController().saveAs(file);
+            ClientController.getClientController().saveAs(file);
         });
 
         m3.addActionListener(e -> {
@@ -173,7 +172,7 @@ public class WhiteBoardClientGUI {
                 System.out.println("no file selected");
                 return;
             }
-            LoginController.getLoginController().open(file);
+            ClientController.getClientController().open(file);
         });
 
         // add menu items to menu
@@ -201,7 +200,7 @@ public class WhiteBoardClientGUI {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("User clicked on quit");
-                LoginController.getLoginController().quit();
+                ClientController.getClientController().quit();
             }
         });
 
@@ -209,7 +208,7 @@ public class WhiteBoardClientGUI {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("User clicked on close");
-                LoginController.getLoginController().close();
+                ClientController.getClientController().close();
             }
         });
 
@@ -218,7 +217,7 @@ public class WhiteBoardClientGUI {
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("kick");
                 String username = (String) userList.getSelectedValue();
-                LoginController.getLoginController().kick(username);
+                ClientController.getClientController().kick(username);
             }
         });
 
@@ -226,7 +225,7 @@ public class WhiteBoardClientGUI {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 System.out.println("create white board");
-                LoginController.getLoginController().createWhiteBoard();
+                ClientController.getClientController().createWhiteBoard();
             }
         });
     }
@@ -246,7 +245,7 @@ public class WhiteBoardClientGUI {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == 1){
-                    LoginController.getLoginController().changeMode((Mode) e.getItem());
+                    ClientController.getClientController().changeMode((Mode) e.getItem());
                 }
             }
         });
@@ -254,9 +253,9 @@ public class WhiteBoardClientGUI {
         c.add(this.modeSelect);
 
 
-        this.canvas.addMouseListener(LoginController.getLoginController());
-        this.canvas.addMouseMotionListener(LoginController.getLoginController());
-        this.canvas.addKeyListener(LoginController.getLoginController());
+        this.canvas.addMouseListener(ClientController.getClientController());
+        this.canvas.addMouseMotionListener(ClientController.getClientController());
+        this.canvas.addKeyListener(ClientController.getClientController());
         // Add the canvas and controls to the main GUI. Canvas above controls.
 //        c.add(whiteBoardController);
         c.add(scroller);

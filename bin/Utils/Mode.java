@@ -1,4 +1,4 @@
-package WhiteBoardClient;
+package Utils;
 
 public enum Mode {
     LINE,

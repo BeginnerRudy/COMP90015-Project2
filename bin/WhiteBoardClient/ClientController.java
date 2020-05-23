@@ -1,7 +1,11 @@
 package WhiteBoardClient;
 
-import RemoteInterface.IRemoteWhiteBoard;
-import WhiteBoardServer.SerializableBufferedImage;
+import Utils.Mode;
+import Utils.MyPoint;
+import WhiteBoardClient.GUI.LoginFrame;
+import WhiteBoardClient.GUI.WhiteBoardClientGUI;
+import WhiteBoardServer.IRemoteWhiteBoard;
+import Utils.SerializableBufferedImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,8 +18,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class LoginController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
-    private static LoginController loginController;
+public class ClientController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
+    private static ClientController clientController;
     private String username;
     private boolean isManger = false;
     private LoginFrame loginFrame;
@@ -25,17 +29,17 @@ public class LoginController extends UnicastRemoteObject implements IRemoteClien
 
     static {
         try {
-            loginController = new LoginController();
+            clientController = new ClientController();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
-    protected LoginController() throws RemoteException {
+    protected ClientController() throws RemoteException {
     }
 
-    public static LoginController getLoginController() {
-        return loginController;
+    public static ClientController getClientController() {
+        return clientController;
     }
 
     public void init(LoginFrame loginFrame, IRemoteWhiteBoard remoteWhiteBoard) {

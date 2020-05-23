@@ -1,4 +1,4 @@
-package WhiteBoardClient;
+package Utils;
 
 public class Util {
     public static class PairOfPoints {

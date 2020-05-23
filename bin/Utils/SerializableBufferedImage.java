@@ -1,13 +1,9 @@
-package WhiteBoardServer;
+package Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Hashtable;
 
 public class SerializableBufferedImage implements Serializable {
     private BufferedImage canvas;

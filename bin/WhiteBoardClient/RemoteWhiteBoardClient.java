@@ -1,6 +1,7 @@
 package WhiteBoardClient;
 
-import RemoteInterface.IRemoteWhiteBoard;
+import WhiteBoardClient.GUI.LoginFrame;
+import WhiteBoardServer.IRemoteWhiteBoard;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -27,7 +28,7 @@ public class RemoteWhiteBoardClient {
             LoginFrame loginFrame = new LoginFrame();
             loginFrame.frame.setVisible(true);
 
-            LoginController.getLoginController().init(loginFrame, remoteWhiteBoard);
+            ClientController.getClientController().init(loginFrame, remoteWhiteBoard);
 
 
 

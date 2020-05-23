@@ -1,6 +1,6 @@
-package WhiteBoardClient;
+package WhiteBoardClient.GUI;
 
-import RemoteInterface.IRemoteWhiteBoard;
+import WhiteBoardClient.ClientController;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -46,7 +46,7 @@ public class LoginFrame {
         btnSend.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                LoginController.getLoginController().join(username.getText());
+                ClientController.getClientController().join(username.getText());
             }
         });
 

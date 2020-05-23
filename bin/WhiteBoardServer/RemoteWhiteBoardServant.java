@@ -1,10 +1,10 @@
 package WhiteBoardServer;
 
-import RemoteInterface.IRemoteWhiteBoard;
+import Utils.SerializableBufferedImage;
 import WhiteBoardClient.IRemoteClient;
-import WhiteBoardClient.Mode;
-import WhiteBoardClient.MyPoint;
-import WhiteBoardClient.Util;
+import Utils.Mode;
+import Utils.MyPoint;
+import Utils.Util;
 
 import java.awt.*;
 import java.rmi.RemoteException;
@@ -12,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static WhiteBoardClient.Util.getRadius;
+import static Utils.Util.getRadius;
 
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
     private ConcurrentHashMap<String, IRemoteClient> users = new ConcurrentHashMap<>(); // stores a hash map between username and its remote interface
@@ -23,6 +23,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     }
 
+    /*==============================user management apis==============================*/
     @Override
     public synchronized boolean join(String username, IRemoteClient remoteClient) throws RemoteException {
         // check if the name has been taken
@@ -41,7 +42,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 }
 
                 // send all user in the whiteboard
-                add_user(username);
+                broadcastingAddUser(username);
                 return true;
 
             } else {
@@ -61,7 +62,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                         e.printStackTrace();
                     }
                     // send all user in the whiteboard
-                    add_user(username);
+                    broadcastingAddUser(username);
                     // send this user the whiteboard, if there is one.
                     if (this.canvas != null) {
                         remoteClient.createCanvas(this.canvas);
@@ -103,7 +104,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         }
         this.users.remove(username);
         this.broadcasting("The white board is closed now");
-        this.closeGUI();
+        this.broadcastingClose();
         this.manager = null; // reset the manager
         this.users.clear();
         return true;
@@ -113,7 +114,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     public synchronized boolean quit(String username) throws RemoteException {
         // notify all the other user in the board this user quits
         this.users.remove(username);
-        this.remove_user(username);
+        this.broadcastingRemoveUser(username);
         this.broadcasting(username + "has quited the board");
         return true;
     }
@@ -130,17 +131,100 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.users.get(username).say("you have been kicked");
         this.users.get(username).closeGUI();
         this.users.remove(username);
-        remove_user(username);
+        broadcastingRemoveUser(username);
         return true;
     }
 
     @Override
     public SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException {
         this.canvas = canvas;
-        broadcastWhiteBoard();
+        broadcastingTheNewCanvas();
         return this.canvas;
     }
 
+
+    /*==============================broadcasting user management action ==============================*/
+    private void broadcastingTheNewCanvas() {
+        for (String username : users.keySet()) {
+            if (!username.equals(manager)) {
+                new Thread(() -> {
+                    try {
+                        this.users.get(username).createCanvas(this.canvas);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+        }
+    }
+
+
+    private void broadcastingAddUser(String username) {
+        for (IRemoteClient remoteClient : users.values()) {
+            new Thread(() -> {
+                try {
+                    remoteClient.addUser(username);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+    private void broadcastingRemoveUser(String username) {
+        for (IRemoteClient remoteClient : users.values()) {
+            new Thread(() -> {
+                try {
+                    remoteClient.removeUser(username);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+
+    private void broadcastingClose() {
+        for (IRemoteClient remoteClient : users.values()) {
+            new Thread(() -> {
+                try {
+                    remoteClient.closeGUI();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+        this.canvas = null;
+    }
+
+    private void broadcasting(String message) {
+        for (IRemoteClient remoteClient : users.values()) {
+            new Thread(() -> {
+                try {
+                    remoteClient.say(message);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+
+    private void broadcasting(String message, String username) {
+        for (String user : users.keySet()) {
+            if (user != username) {
+                new Thread(() -> {
+                    try {
+                        users.get(user).say(message);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+        }
+    }
+
+
+    /*===========================user remote drawing apis=============================*/
     @Override
     public synchronized void drawShape(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException {
         System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
@@ -152,7 +236,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             case FREEHAND:
                 g.drawLine(start.x, start.y, end.x, end.y);
                 break;
-            case RECTANGLE: // TODO calculate the correct point
+            case RECTANGLE:
                 Util.PairOfPoints pairOfPoints = Util.getCorrectPoints(start, end);
 
                 start = pairOfPoints.start;
@@ -184,86 +268,6 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         for (String user : users.keySet()) {
             if (!user.equals(username)) {
                 this.users.get(user).drawString(start, c);
-            }
-        }
-    }
-
-
-    private void broadcastWhiteBoard() {
-        for (String username : users.keySet()) {
-            if (!username.equals(manager)) {
-                new Thread(() -> {
-                    try {
-                        this.users.get(username).createCanvas(this.canvas);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-            }
-        }
-    }
-
-
-    private void add_user(String username) throws RemoteException {
-        for (IRemoteClient remoteClient : users.values()) {
-            new Thread(() -> {
-                try {
-                    remoteClient.addUser(username);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-    }
-
-    private void remove_user(String username) throws RemoteException {
-        for (IRemoteClient remoteClient : users.values()) {
-            new Thread(() -> {
-                try {
-                    remoteClient.removeUser(username);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-    }
-
-
-    private void closeGUI() throws RemoteException {
-        for (IRemoteClient remoteClient : users.values()) {
-            new Thread(() -> {
-                try {
-                    remoteClient.closeGUI();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-        this.canvas = null;
-    }
-
-    private void broadcasting(String message) throws RemoteException {
-        for (IRemoteClient remoteClient : users.values()) {
-            new Thread(() -> {
-                try {
-                    remoteClient.say(message);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-    }
-
-    private void broadcasting(String message, String username) throws RemoteException {
-        for (String user : users.keySet()) {
-            if (user != username) {
-                new Thread(() -> {
-                    try {
-                        users.get(user).say(message);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
             }
         }
     }

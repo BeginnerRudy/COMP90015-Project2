@@ -1,6 +1,8 @@
-package WhiteBoardClient;
+package WhiteBoardClient.GUI;
 
-import WhiteBoardServer.SerializableBufferedImage;
+import Utils.Mode;
+import Utils.MyPoint;
+import Utils.Util;
 
 import javax.swing.*;
 import java.awt.*;
