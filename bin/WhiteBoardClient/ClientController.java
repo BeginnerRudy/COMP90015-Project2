@@ -139,9 +139,12 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     /*========================================WhiteBoard Management========================================*/
     public void quit() {
         try {
-            // TODO quit not functionally correct.
-            this.remoteWhiteBoard.quit(this.username);
-            this.closeGUI();
+            if (isManager){
+                this.close();
+            }else {
+                this.remoteWhiteBoard.quit(this.username);
+                this.closeGUI();
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
