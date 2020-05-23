@@ -1,5 +1,6 @@
 package WhiteBoardServer;
 
+import Utils.CloseType;
 import WhiteBoardClient.IRemoteClient;
 import Utils.Mode;
 import Utils.MyPoint;

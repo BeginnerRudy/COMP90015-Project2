@@ -1,10 +1,7 @@
 package WhiteBoardServer;
 
-import Utils.SerializableBufferedImage;
+import Utils.*;
 import WhiteBoardClient.IRemoteClient;
-import Utils.Mode;
-import Utils.MyPoint;
-import Utils.Util;
 
 import java.awt.*;
 import java.rmi.RemoteException;
@@ -129,7 +126,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     @Override
     public boolean kick(String username) throws RemoteException {
         this.users.get(username).say("you have been kicked");
-        this.users.get(username).closeGUI();
+        this.users.get(username).closeGUI(CloseType.KICKED);
         this.users.remove(username);
         broadcastingRemoveUser(username);
         return true;
@@ -188,7 +185,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         for (IRemoteClient remoteClient : users.values()) {
             new Thread(() -> {
                 try {
-                    remoteClient.closeGUI();
+                    remoteClient.closeGUI(CloseType.MANAGER_CLOSE);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

@@ -1,5 +1,6 @@
 package WhiteBoardClient;
 
+import Utils.CloseType;
 import Utils.Mode;
 import Utils.MyPoint;
 import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
@@ -35,6 +36,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
 
     private IRemoteWhiteBoard remoteWhiteBoard;
+
     static {
         try {
             clientController = new ClientController();
@@ -55,7 +57,6 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
 
-
     /*========================================Advanced features========================================*/
     public boolean isManager() {
         return isManager;
@@ -72,6 +73,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             }
         }
     }
+
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
         if (this.whiteBoardClientGUI.canvas == null) {
@@ -129,7 +131,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     public void close() {
         try {
             this.remoteWhiteBoard.close(this.username);
-            this.closeGUI();
+            this.closeGUI(CloseType.SELF_CLOSE);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -139,11 +141,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     /*========================================WhiteBoard Management========================================*/
     public void quit() {
         try {
-            if (isManager){
+            if (isManager) {
                 this.close();
-            }else {
+            } else {
                 this.remoteWhiteBoard.quit(this.username);
-                this.closeGUI();
+                this.closeGUI(CloseType.SELF_CLOSE);
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -151,14 +153,14 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
     public void kick(String username) {
-        if (!username.equals(this.username)){
+        if (!username.equals(this.username)) {
             try {
                 // Manager cannot kick itself
                 this.remoteWhiteBoard.kick(username);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }else{
+        } else {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You cannot kick yourself!");
         }
 
@@ -190,7 +192,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
             e.printStackTrace();
-        } catch ( NotBoundException e){
+        } catch (NotBoundException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
         }
@@ -228,7 +230,16 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
     @Override
-    public void closeGUI() throws RemoteException {
+    public void closeGUI(CloseType closeType) throws RemoteException {
+        if (closeType.equals(CloseType.KICKED)) {
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You have been kicked out by the manager!");
+        } else if (closeType.equals(CloseType.MANAGER_CLOSE)) {
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The manager has closed the whiteboard!");
+
+        } else if (closeType.equals(CloseType.SELF_CLOSE)) {
+//            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
+
+        }
 
         new Thread(() -> {
             System.out.print("Shutting down...");
