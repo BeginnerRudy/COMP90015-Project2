@@ -4,6 +4,8 @@ import Utils.*;
 import WhiteBoardClient.IRemoteClient;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -15,9 +17,22 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     private ConcurrentHashMap<String, IRemoteClient> users = new ConcurrentHashMap<>(); // stores a hash map between username and its remote interface
     private String manager; // The username of the manager
     private SerializableBufferedImage canvas; // This image stores the whiteboard image
+    private ServerGUI serverGUI = new ServerGUI();
 
     protected RemoteWhiteBoardServant() throws RemoteException {
+        serverGUI.getCloseButton().addActionListener(e -> {
+            if (this.manager != null){
+                try {
+                    this.close(manager, CloseType.SERVER_CLOSE);
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                }
+            }else {
+                System.out.println("Exits");
+            }
+        });
 
+        System.out.println("Closed");
     }
 
     /*==============================user management apis==============================*/
@@ -91,7 +106,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     @Override
-    public synchronized boolean close(String username) throws RemoteException {
+    public synchronized boolean close(String username, CloseType closeType) throws RemoteException {
 
         // notify all the other user in the board that the board has been closed.
         if (!username.equals(manager)) {
@@ -100,10 +115,10 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             return false;
         }
 
-        this.broadcastingRemoveUser(username);
-        this.users.remove(username);
+//        this.broadcastingRemoveUser(username);
+//        this.users.remove(username);
         this.broadcasting("The white board is closed now");
-        this.broadcastingClose();
+        this.broadcastingClose(closeType);
         this.manager = null; // reset the manager
         this.users.clear();
         return true;
@@ -183,21 +198,37 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
 
-    private void broadcastingClose() {
+    private void broadcastingClose(CloseType closeType) {
         // remove all user from every user's user list
         for (String username : users.keySet()) {
             this.broadcastingRemoveUser(username);
         }
 
-        for (IRemoteClient remoteClient : users.values()) {
-            new Thread(() -> {
-                try {
-                    remoteClient.closeGUI(CloseType.MANAGER_CLOSE);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+        if (closeType.equals(CloseType.SERVER_CLOSE)){
+            for (IRemoteClient remoteClient : users.values()){
+                new Thread(() -> {
+                    try {
+                        remoteClient.closeGUI(closeType);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+        }else if (closeType.equals(CloseType.MANAGER_CLOSE)){
+            this.users.remove(manager);
+            for (IRemoteClient remoteClient : users.values()){
+                new Thread(() -> {
+                    try {
+                        remoteClient.closeGUI(closeType);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
         }
+
+        this.users.clear();
+        this.manager = null;
         this.canvas = null;
     }
 

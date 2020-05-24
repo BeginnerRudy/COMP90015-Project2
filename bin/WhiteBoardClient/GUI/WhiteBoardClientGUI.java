@@ -224,14 +224,17 @@ public class WhiteBoardClientGUI {
             }
         });
 
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                if (JOptionPane.showConfirmDialog(frame,
+                int res = JOptionPane.showConfirmDialog(frame,
                         "Are you sure you want to close this whiteboard?", "Close Window?",
                         JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-                    if (ClientController.getClientController().isManager()){
+                        JOptionPane.QUESTION_MESSAGE);
+
+                if ( res == JOptionPane.YES_OPTION){
+                    if (ClientController.getClientController().isManager()&&!ClientController.getClientController().isClosedByServer()){
                         ClientController.getClientController().close();
                     }else {
                         ClientController.getClientController().quit();

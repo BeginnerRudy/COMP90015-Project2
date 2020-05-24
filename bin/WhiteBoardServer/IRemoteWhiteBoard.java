@@ -14,7 +14,7 @@ public interface IRemoteWhiteBoard extends Remote {
     /*==============================user management apis==============================*/
     boolean join(String username, IRemoteClient remoteClient) throws RemoteException;
     SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException;
-    boolean close(String username) throws RemoteException;
+    boolean close(String username, CloseType closeType) throws RemoteException;
     boolean quit(String username) throws RemoteException;
     boolean kick(String username) throws RemoteException;
     ArrayList<String> getUserList() throws RemoteException;

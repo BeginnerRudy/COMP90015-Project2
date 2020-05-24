@@ -32,6 +32,8 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     private boolean isManager = false;
     private boolean isClosed = true;
 
+    private boolean isClosedByServer = false;
+
     private WhiteBoardLoginFrame whiteBoardLoginFrame;
 
     private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
@@ -59,6 +61,10 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
 
     /*========================================Advanced features========================================*/
+
+    public boolean isClosedByServer() {
+        return isClosedByServer;
+    }
     public boolean isManager() {
         return isManager;
     }
@@ -77,7 +83,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
-        if (this.whiteBoardClientGUI.canvas == null) {
+        if (this.isClosedByServer) {
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
+        } else if (this.whiteBoardClientGUI.canvas == null) {
             this.isClosed = false;
             this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
         } else {
@@ -87,7 +95,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     public void createWhiteBoard() {
         try {
-            if (this.whiteBoardClientGUI.canvas == null) {
+            if (this.isClosedByServer) {
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
+            } else if (this.whiteBoardClientGUI.canvas == null) {
                 SerializableBufferedImage canvas = new SerializableBufferedImage(WHITEBOARD_WIDTH, WHITEBOARD_HEIGHT);
                 this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
                 this.isClosed = false;
@@ -103,7 +113,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     public void open(File canvas) {
         //TODO could the manger open or create more than one whiteboard at one time ?
         try {
-            if (this.whiteBoardClientGUI.canvas == null) {
+            if (this.isClosedByServer) {
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
+            } else if (this.whiteBoardClientGUI.canvas == null) {
                 BufferedImage imageOnDisk = ImageIO.read(canvas);
                 this.whiteBoardClientGUI.createCanvas(imageOnDisk);
                 this.isClosed = false;
@@ -134,8 +146,12 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     public void close() {
         try {
-            this.remoteWhiteBoard.close(this.username);
-            this.closeGUI(CloseType.SELF_CLOSE);
+            if (this.isClosedByServer) {
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server! Please click quit to exit.");
+            } else {
+                this.remoteWhiteBoard.close(this.username, CloseType.MANAGER_CLOSE);
+                this.closeGUI(CloseType.SELF_CLOSE);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -145,13 +161,19 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     /*========================================WhiteBoard Management========================================*/
     public void quit() {
         try {
-            if (isManager) {
+            if (isManager && !this.isClosedByServer) {
                 this.close();
             } else {
-                if (!this.isClosed){
+
+                if (this.whiteBoardClientGUI.canvas == null || !this.isClosed && !this.isClosedByServer) {
+
                     this.remoteWhiteBoard.quit(this.username);
+                    System.out.println("quit");
                 }
+                System.out.println(isClosed);
+                System.out.println(isClosedByServer);
                 this.closeGUI(CloseType.SELF_CLOSE);
+                System.out.println("closed!!!!");
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -159,7 +181,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     }
 
     public void kick(String username) {
-        if (!username.equals(this.username)) {
+        if (this.isClosedByServer) {
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
+        } else if (!username.equals(this.username)) {
             try {
                 // Manager cannot kick itself
                 this.remoteWhiteBoard.kick(username);
@@ -247,6 +271,13 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             this.whiteBoardClientGUI.canvas.removeMouseListener(this);
             this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
             this.whiteBoardClientGUI.canvas.removeKeyListener(this);
+        } else if (closeType.equals(CloseType.SERVER_CLOSE)) {
+            this.isClosedByServer = true;
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The SERVER has closed the whiteboard!");
+            // The whiteboard is closed, so no more action on the white board
+            this.whiteBoardClientGUI.canvas.removeMouseListener(this);
+            this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
+            this.whiteBoardClientGUI.canvas.removeKeyListener(this);
         } else if (closeType.equals(CloseType.SELF_CLOSE)) {
 //            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
             this.closing();
@@ -255,7 +286,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     }
 
-    private void closing(){
+    private void closing() {
         new Thread(() -> {
             System.out.print("Shutting down...");
             System.out.println("done");

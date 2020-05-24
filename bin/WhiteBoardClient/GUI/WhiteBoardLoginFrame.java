@@ -85,6 +85,7 @@ public class WhiteBoardLoginFrame {
                         ClientController.getClientController().join(username.getText(), portNum);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, "Please enter integer for port number!");
+                        e.printStackTrace();
                     }
                 }
             }
