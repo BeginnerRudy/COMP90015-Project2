@@ -99,6 +99,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             System.out.println(manager + username);
             return false;
         }
+
+        this.broadcastingRemoveUser(username);
         this.users.remove(username);
         this.broadcasting("The white board is closed now");
         this.broadcastingClose();
@@ -182,6 +184,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
 
     private void broadcastingClose() {
+        // remove all user from every user's user list
+        for (String username : users.keySet()) {
+            this.broadcastingRemoveUser(username);
+        }
+
         for (IRemoteClient remoteClient : users.values()) {
             new Thread(() -> {
                 try {

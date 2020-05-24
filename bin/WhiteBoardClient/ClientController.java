@@ -30,6 +30,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     private String username;
 
     private boolean isManager = false;
+    private boolean isClosed = true;
 
     private WhiteBoardLoginFrame whiteBoardLoginFrame;
 
@@ -77,6 +78,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
         if (this.whiteBoardClientGUI.canvas == null) {
+            this.isClosed = false;
             this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
         } else {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
@@ -88,6 +90,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             if (this.whiteBoardClientGUI.canvas == null) {
                 SerializableBufferedImage canvas = new SerializableBufferedImage(WHITEBOARD_WIDTH, WHITEBOARD_HEIGHT);
                 this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
+                this.isClosed = false;
                 this.remoteWhiteBoard.create(canvas);
             } else {
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
@@ -103,6 +106,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             if (this.whiteBoardClientGUI.canvas == null) {
                 BufferedImage imageOnDisk = ImageIO.read(canvas);
                 this.whiteBoardClientGUI.createCanvas(imageOnDisk);
+                this.isClosed = false;
                 this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
             } else {
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
@@ -144,7 +148,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             if (isManager) {
                 this.close();
             } else {
-                this.remoteWhiteBoard.quit(this.username);
+                if (!this.isClosed){
+                    this.remoteWhiteBoard.quit(this.username);
+                }
                 this.closeGUI(CloseType.SELF_CLOSE);
             }
         } catch (RemoteException e) {
@@ -233,14 +239,23 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     public void closeGUI(CloseType closeType) throws RemoteException {
         if (closeType.equals(CloseType.KICKED)) {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You have been kicked out by the manager!");
+            this.closing();
         } else if (closeType.equals(CloseType.MANAGER_CLOSE)) {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The manager has closed the whiteboard!");
-
+            this.isClosed = true;
+            // The whiteboard is closed, so no more action on the white board
+            this.whiteBoardClientGUI.canvas.removeMouseListener(this);
+            this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
+            this.whiteBoardClientGUI.canvas.removeKeyListener(this);
         } else if (closeType.equals(CloseType.SELF_CLOSE)) {
 //            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
+            this.closing();
 
         }
 
+    }
+
+    private void closing(){
         new Thread(() -> {
             System.out.print("Shutting down...");
             System.out.println("done");
