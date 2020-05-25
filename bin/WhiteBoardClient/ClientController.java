@@ -276,16 +276,20 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The manager has closed the whiteboard!");
             this.isClosed = true;
             // The whiteboard is closed, so no more action on the white board
-            this.whiteBoardClientGUI.canvas.removeMouseListener(this);
-            this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
-            this.whiteBoardClientGUI.canvas.removeKeyListener(this);
+            if (this.whiteBoardClientGUI.canvas != null){
+                this.whiteBoardClientGUI.canvas.removeMouseListener(this);
+                this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
+                this.whiteBoardClientGUI.canvas.removeKeyListener(this);
+            }
         } else if (closeType.equals(CloseType.SERVER_CLOSE)) {
             this.isClosedByServer = true;
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The SERVER has closed the whiteboard!");
             // The whiteboard is closed, so no more action on the white board
-            this.whiteBoardClientGUI.canvas.removeMouseListener(this);
-            this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
-            this.whiteBoardClientGUI.canvas.removeKeyListener(this);
+            if (this.whiteBoardClientGUI.canvas != null){
+                this.whiteBoardClientGUI.canvas.removeMouseListener(this);
+                this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
+                this.whiteBoardClientGUI.canvas.removeKeyListener(this);
+            }
         } else if (closeType.equals(CloseType.SELF_CLOSE)) {
 //            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
             this.closing();

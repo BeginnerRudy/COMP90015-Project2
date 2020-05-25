@@ -19,27 +19,40 @@ public class WhiteBoardLoginFrame {
 
         // Initialize the frame
         frame = new JFrame();
-        frame.setBounds(100, 100, 400, 250);
+        frame.setBounds(100, 100, 400, 300);
         frame.getContentPane().setLayout(null);
         frame.setTitle("Client Whiteboard ");
 
         // Initialize the panel
         panel = new JPanel();
-        panel.setBounds(0, 0, 400, 250);
+        panel.setBounds(0, 0, 400, 300);
         frame.getContentPane().add(panel);
         panel.setLayout(null);
 
         int textField_x = 130;
         int label_text_x_gap = 80;
         int textField_y_gap = 45;
-        int port_textFiled_y = 75;
+        int port_textFiled_y = 120;
 
         // set icon
         JLabel icon = new JLabel();
         icon.setText("Shared Canvas");
 //        icon.setIcon(new ImageIcon(this.getClass().getResource("/home/rudy/Code/Distributed-Computing/Distributed-Whiteboard/bin/whiteboard.jpg")));
-        icon.setBounds(textField_x + 35, port_textFiled_y - textField_y_gap, 120, 33);
+        icon.setBounds(textField_x + 35, port_textFiled_y - 2*textField_y_gap, 120, 33);
         panel.add(icon);
+
+        // The prompt label for port
+        JLabel host_label = new JLabel();
+        host_label.setBounds(textField_x - label_text_x_gap, port_textFiled_y - textField_y_gap, 50, 32);
+        panel.add(host_label);
+        host_label.setText("Host");
+
+        // Enter dialogue textField
+        JTextField host = new JTextField();
+        host.setBounds(textField_x, port_textFiled_y - textField_y_gap, 181, 32);
+        panel.add(host);
+        host.setColumns(10);
+
 
         // The prompt label for port
         JLabel port_label = new JLabel();
