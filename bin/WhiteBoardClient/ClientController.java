@@ -193,9 +193,10 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     }
 
-    public boolean join(String username, int port) {
+    public boolean join(String username, String host, int port) {
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost", port);
+            // TODO host check
+            Registry registry = LocateRegistry.getRegistry(host, port);
             IRemoteWhiteBoard remoteWhiteBoard = (IRemoteWhiteBoard) registry.lookup("WhiteBoard");
             this.remoteWhiteBoard = remoteWhiteBoard;
             // communicate with the Remote White board
@@ -228,11 +229,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 }
             }
         } catch (RemoteException e) {
-            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
+            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The host or port maybe not correct, cannot find the RMI in the registry!");
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
+            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The host or port maybe not correct, cannot find the RMI in the registry!");
         }
         return false;
     }

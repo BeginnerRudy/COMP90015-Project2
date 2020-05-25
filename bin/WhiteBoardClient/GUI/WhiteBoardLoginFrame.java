@@ -38,7 +38,7 @@ public class WhiteBoardLoginFrame {
         JLabel icon = new JLabel();
         icon.setText("Shared Canvas");
 //        icon.setIcon(new ImageIcon(this.getClass().getResource("/home/rudy/Code/Distributed-Computing/Distributed-Whiteboard/bin/whiteboard.jpg")));
-        icon.setBounds(textField_x + 35, port_textFiled_y - 2*textField_y_gap, 120, 33);
+        icon.setBounds(textField_x + 35, port_textFiled_y - 2 * textField_y_gap, 120, 33);
         panel.add(icon);
 
         // The prompt label for port
@@ -94,8 +94,9 @@ public class WhiteBoardLoginFrame {
 
                 } else {
                     try {
+                        // TODO check host validity
                         portNum = Integer.parseInt(port.getText());
-                        ClientController.getClientController().join(username.getText(), portNum);
+                        ClientController.getClientController().join(username.getText(), host.getText(), portNum);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, "Please enter integer for port number!");
                         e.printStackTrace();
