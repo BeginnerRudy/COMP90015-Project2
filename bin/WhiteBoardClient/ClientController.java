@@ -182,12 +182,12 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
         } else if (!username.equals(this.username)) {
             try {
-                // Manager cannot kick itself
                 this.remoteWhiteBoard.kick(username);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         } else {
+            // Manager cannot kick itself
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You cannot kick yourself!");
         }
 
@@ -205,16 +205,17 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             if (res.equals(MessageType.SUCCESS_JOIN)) {
                 this.username = username;
 
+                this.whiteBoardLoginFrame.frame.dispose();
+                this.whiteBoardClientGUI.frame.setVisible(true);
                 // show manager options
                 if (isManager) {
                     this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
                     this.whiteBoardClientGUI.kickButton.setVisible(true);
                     this.whiteBoardClientGUI.createBtn.setVisible(true);
                     this.whiteBoardClientGUI.mb.setVisible(true);
+                    JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You are the manager now!");
                 }
 
-                this.whiteBoardLoginFrame.frame.dispose();
-                this.whiteBoardClientGUI.frame.setVisible(true);
                 return true;
             }else {
                 switch (res){
