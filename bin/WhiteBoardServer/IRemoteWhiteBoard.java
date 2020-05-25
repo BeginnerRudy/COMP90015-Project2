@@ -1,10 +1,7 @@
 package WhiteBoardServer;
 
-import Utils.CloseType;
+import Utils.*;
 import WhiteBoardClient.IRemoteClient;
-import Utils.Mode;
-import Utils.MyPoint;
-import Utils.SerializableBufferedImage;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -12,7 +9,7 @@ import java.util.ArrayList;
 
 public interface IRemoteWhiteBoard extends Remote {
     /*==============================user management apis==============================*/
-    boolean join(String username, IRemoteClient remoteClient) throws RemoteException;
+    MessageType join(String username, IRemoteClient remoteClient) throws RemoteException;
     SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException;
     boolean close(String username, CloseType closeType) throws RemoteException;
     boolean quit(String username) throws RemoteException;

@@ -1,12 +1,9 @@
 package WhiteBoardClient;
 
-import Utils.CloseType;
-import Utils.Mode;
-import Utils.MyPoint;
+import Utils.*;
 import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
 import WhiteBoardClient.GUI.WhiteBoardClientGUI;
 import WhiteBoardServer.IRemoteWhiteBoard;
-import Utils.SerializableBufferedImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -203,7 +200,8 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             this.remoteWhiteBoard = remoteWhiteBoard;
             // communicate with the Remote White board
             // if could join
-            if (this.remoteWhiteBoard.join(username, this)) {
+            MessageType res = this.remoteWhiteBoard.join(username, this);
+            if (res.equals(MessageType.SUCCESS_JOIN)) {
                 this.username = username;
 
                 // show manager options
@@ -216,9 +214,19 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
                 this.whiteBoardLoginFrame.frame.dispose();
                 this.whiteBoardClientGUI.frame.setVisible(true);
+                return true;
+            }else {
+                switch (res){
+                    case DUPLICATE_NAME:
+                        JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The user name has already been taken!");
+                        break;
+                    case REFUSED_JOIN:
+                        JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The manager are not allow you to join!");
+                        break;
+                    default:
+                        System.out.println("not support");
+                }
             }
-
-            return true;
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The port is not correct, cannot find the RMI in the registry!");
             e.printStackTrace();

@@ -37,7 +37,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     /*==============================user management apis==============================*/
     @Override
-    public synchronized boolean join(String username, IRemoteClient remoteClient) throws RemoteException {
+    public synchronized MessageType join(String username, IRemoteClient remoteClient) throws RemoteException {
         // check if the name has been taken
         if (!this.users.containsKey(username)) {
             // check if it is the first user
@@ -55,7 +55,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
                 // send all user in the whiteboard
                 broadcastingAddUser(username);
-                return true;
+                return MessageType.SUCCESS_JOIN;
 
             } else {
                 // ask whether the manager allow this new user to join
@@ -79,17 +79,16 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     if (this.canvas != null) {
                         remoteClient.createCanvas(this.canvas);
                     }
-                    return true;
+                    return MessageType.SUCCESS_JOIN;
                 } else {
 
-                    // name already exits ! Failed to join.
                     try {
                         remoteClient.say("You are not allowed to join.");
                     } catch (RemoteException e) {
                         e.printStackTrace();
                         System.out.println("==Error= name collision, failed to join");
                     }
-                    return false;
+                    return MessageType.REFUSED_JOIN;
                 }
 
             }
@@ -97,12 +96,14 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             // name already exits ! Failed to join.
             try {
                 remoteClient.say("The name has already existed, please try another name. ");
+                return MessageType.DUPLICATE_NAME;
             } catch (RemoteException e) {
                 e.printStackTrace();
                 System.out.println("==Error= name collision, failed to join");
             }
-            return false;
+//            return Mes;
         }
+        return MessageType.UNKNOWN_FAILURE;
     }
 
     @Override

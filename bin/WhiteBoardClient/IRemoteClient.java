@@ -1,9 +1,6 @@
 package WhiteBoardClient;
 
-import Utils.CloseType;
-import Utils.Mode;
-import Utils.MyPoint;
-import Utils.SerializableBufferedImage;
+import Utils.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
