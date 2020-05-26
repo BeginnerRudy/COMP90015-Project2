@@ -188,10 +188,10 @@ public class WhiteBoard extends JPanel implements Serializable {
                     default:
                         System.out.println("not support");
                 }
-                System.out.println("not fixed");
+//                System.out.println("not fixed");
             } else {
-                System.out.println(lastPoint.x);
-                System.out.println(firstPoint.y);
+//                System.out.println(lastPoint.x);
+//                System.out.println(firstPoint.y);
 
                 switch (mode) {
                     case LINE:
@@ -210,7 +210,7 @@ public class WhiteBoard extends JPanel implements Serializable {
                 if (this.getMode() != Mode.TEXT) { // no need to make it null for the text case
                     this.firstPoint = null;
                     this.lastPoint = null;
-                    System.out.println("fixed");
+//                    System.out.println("fixed");
                 }
             }
         }else{

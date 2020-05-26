@@ -5,15 +5,10 @@ import WhiteBoardClient.ClientController;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.security.spec.ECField;
 
 public class WhiteBoardLoginFrame {
     public JFrame frame;
     private JPanel panel;
-
-    public static void main(String[] args) {
-        new WhiteBoardLoginFrame().frame.setVisible(true);
-    }
 
     public WhiteBoardLoginFrame() {
 

@@ -20,8 +20,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.List;
 
-import static Utils.Util.WHITEBOARD_HEIGHT;
-import static Utils.Util.WHITEBOARD_WIDTH;
+import static Utils.Util.*;
 
 public class ClientController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
     private static ClientController clientController;
@@ -42,7 +41,8 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         try {
             clientController = new ClientController();
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            clientPrinter("Error", "Failed to create client");
         }
     }
 
@@ -74,8 +74,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             try {
                 ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", out);
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Successful!");
+                clientPrinter("Success", "Save as successfully");
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                clientPrinter("Error", "Failed to save as");
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Fail to save as");
             }
         }
     }
@@ -98,14 +101,16 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
             } else if (this.whiteBoardClientGUI.canvas == null) {
                 SerializableBufferedImage canvas = new SerializableBufferedImage(WHITEBOARD_WIDTH, WHITEBOARD_HEIGHT);
+                this.remoteWhiteBoard.create(canvas);
                 this.whiteBoardClientGUI.createCanvas(canvas.getWhiteBoard());
                 this.isClosed = false;
-                this.remoteWhiteBoard.create(canvas);
             } else {
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
             }
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            clientPrinter("Error", "Failed to create canvas on other clients");
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The server might be down. Failed to create.");
         }
     }
 
@@ -116,15 +121,17 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
             } else if (this.whiteBoardClientGUI.canvas == null) {
                 BufferedImage imageOnDisk = ImageIO.read(canvas);
+                this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
                 this.whiteBoardClientGUI.createCanvas(imageOnDisk);
                 this.isClosed = false;
-                this.remoteWhiteBoard.create(new SerializableBufferedImage(imageOnDisk));
             } else {
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has already exists!");
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            clientPrinter("Error", "Failed to open the canvas");
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The server might be down. Failed to open.");
         }
     }
 
@@ -136,7 +143,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Saved as Untitled.png.");
             } catch (IOException ee) {
                 // handle exception
-                ee.printStackTrace();
+//                ee.printStackTrace();
+                clientPrinter("Error", "Failed to save the canvas.");
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Fail to save");
             }
         } else {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Please create a whiteboard first!");
@@ -152,7 +161,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 this.closeGUI(CloseType.SELF_CLOSE);
             }
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Fail to close, the remote server might crashed.");
+            clientPrinter("Error", "Failed to close canvas on other clients");
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The app would be closed directly.");
+            System.exit(1);
         }
     }
 
@@ -167,22 +180,26 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 if (this.whiteBoardClientGUI.canvas == null || !this.isClosed && !this.isClosedByServer) {
 
                     this.remoteWhiteBoard.quit(this.username);
-                    System.out.println("quit");
+//                    System.out.println("quit");
                 }
-                System.out.println(isClosed);
-                System.out.println(isClosedByServer);
+//                System.out.println(isClosed);
+//                System.out.println(isClosedByServer);
                 this.closeGUI(CloseType.SELF_CLOSE);
-                System.out.println("closed!!!!");
+//                System.out.println("closed!!!!");
             }
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            clientPrinter("Error", "Failed to quit the canvas remotely");
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Fail to quit, the remote server might crashed.");
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The app would be closed directly.");
+            System.exit(1);
         }
     }
 
     @Override
     public void becomeManager() throws RemoteException {
         this.isManager = true;
-        System.out.println("be come manager");
+//        System.out.println("be come manager");
         this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
         this.whiteBoardClientGUI.kickButton.setVisible(true);
         this.whiteBoardClientGUI.createBtn.setVisible(true);
@@ -204,7 +221,10 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             try {
                 this.remoteWhiteBoard.kick(username);
             } catch (RemoteException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                clientPrinter("Error", "Failed to kick the user");
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Failed to kick the user, the remote server might crashed.");
+
             }
         } else {
             // Manager cannot kick itself
@@ -252,12 +272,14 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The user is not in the room!");
                         }
                     }
-                    System.out.println(newManager);
+//                    System.out.println(newManager);
                 }
 
 
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                clientPrinter("Error", "Failed to transfer the manager to another user.");
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The server might be crashed. Failed to transfer the manager to another user.");
             }
         }
 
@@ -301,10 +323,13 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             }
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The host or port maybe not correct, cannot find the RMI in the registry!");
-            e.printStackTrace();
+            clientPrinter("Error", "The host or port maybe not correct, cannot find the RMI in the registry!");
+//            e.printStackTrace();
         } catch (NotBoundException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The host or port maybe not correct, cannot find the RMI in the registry!");
+//            e.printStackTrace();
+            JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "Cannot find the RMI in the registry! Name may not bind!");
+            clientPrinter("Error", "Cannot find the RMI in the registry! Name may not bind!");
+
         }
         return false;
     }
@@ -397,7 +422,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     /*========================================WhiteBoard Drawing========================================*/
     public void changeMode(Mode mode) {
         this.whiteBoardClientGUI.canvas.setMode(mode);
-        System.out.println(mode); // TODO debug
+//        System.out.println(mode);
     }
 
     @Override
@@ -432,14 +457,14 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("Pressed");
+//        System.out.println("Pressed");
         this.whiteBoardClientGUI.canvas.fixed = false;
         this.whiteBoardClientGUI.canvas.lastPoint = new MyPoint(e.getPoint());
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        System.out.println("dragged");
+//        System.out.println("dragged");
         this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
         if (this.whiteBoardClientGUI.canvas.getMode() != Mode.FREEHAND) {
             this.whiteBoardClientGUI.canvas.repaint();
@@ -448,14 +473,16 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 this.remoteWhiteBoard.drawShape(this.username, this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, this.whiteBoardClientGUI.canvas.getMode());
                 this.whiteBoardClientGUI.canvas.drawLine(this.whiteBoardClientGUI.canvas.lastPoint, this.whiteBoardClientGUI.canvas.firstPoint, Color.BLACK, 1);
             } catch (RemoteException ee) {
-                ee.printStackTrace();
+//                ee.printStackTrace();
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The server might be down. Failed to draw.");
+                clientPrinter("Error", "Failed to draw remotely!!!");
             }
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("released");
+//        System.out.println("released");
         try {
             if (this.whiteBoardClientGUI.canvas.getMode() != Mode.FREEHAND) {
                 this.whiteBoardClientGUI.canvas.firstPoint = new MyPoint(e.getPoint());
@@ -468,13 +495,15 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 this.whiteBoardClientGUI.canvas.repaint();
             }
         } catch (RemoteException ee) {
-            ee.printStackTrace();
+//            ee.printStackTrace();
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The server might be down. Failed to draw.");
+            clientPrinter("Error", "Failed to draw remotely!!!");
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("Clicked");
+//        System.out.println("Clicked");
         if (this.whiteBoardClientGUI.canvas.getMode() == Mode.TEXT) {
             this.whiteBoardClientGUI.canvas.lastPoint = new MyPoint(e.getPoint());
         }
@@ -482,13 +511,15 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     @Override
     public void keyTyped(KeyEvent e) {
-        System.out.println("typed");
+//        System.out.println("typed");
         if (this.whiteBoardClientGUI.canvas.getMode().equals(Mode.TEXT)) {
             try {
                 this.remoteWhiteBoard.drawString(this.username, this.whiteBoardClientGUI.canvas.lastPoint, e.getKeyChar());
                 this.whiteBoardClientGUI.canvas.drawString(e.getKeyChar());
             } catch (RemoteException ee) {
-                ee.printStackTrace();
+//                ee.printStackTrace();
+                JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The server might be down. Failed to draw.");
+                clientPrinter("Error", "Failed to input text remotely!!!");
             }
         }
     }

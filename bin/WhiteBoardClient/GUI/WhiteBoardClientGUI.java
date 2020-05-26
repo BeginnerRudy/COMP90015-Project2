@@ -2,7 +2,6 @@ package WhiteBoardClient.GUI;
 
 import Utils.Mode;
 import WhiteBoardClient.ClientController;
-import WhiteBoardServer.IRemoteWhiteBoard;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -10,14 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.swing.*;
 
-import static Utils.Util.WHITEBOARD_HEIGHT;
-import static Utils.Util.WHITEBOARD_WIDTH;
 
 public class WhiteBoardClientGUI {
-
-    public static void main(String[] args) {
-        new WhiteBoardClientGUI().frame.setVisible(true);
-    }
 
     // Define GUI elements
     public JFrame frame;
@@ -133,14 +126,14 @@ public class WhiteBoardClientGUI {
 
         // add ActionListener to menuItems
         m1.addActionListener(e -> {
-            System.out.println("Click on save");
+//            System.out.println("Click on save");
             ClientController.getClientController().save();
         });
 
         m2.addActionListener(e -> {
             //TODO implement file type and check whether there is already a whiteboard
 
-            System.out.println("Click on Save as");
+//            System.out.println("Click on Save as");
             if (this.canvas != null) {
                 JFileChooser j = new JFileChooser("./data/");
                 j.showDialog(this.frame, "Save as");
@@ -148,7 +141,7 @@ public class WhiteBoardClientGUI {
 //            String filename = "d.png";
                 File file = j.getSelectedFile();
                 if (file == null) {
-                    System.out.println("no file selected");
+//                    System.out.println("no file selected");
                     return;
                 }
                 ClientController.getClientController().saveAs(file);
@@ -172,7 +165,7 @@ public class WhiteBoardClientGUI {
 
                 File file = filePicker.getSelectedFile();
                 if (file == null) {
-                    System.out.println("no file selected");
+//                    System.out.println("no file selected");
                     return;
                 }
                 ClientController.getClientController().open(file);
@@ -199,7 +192,7 @@ public class WhiteBoardClientGUI {
         quitBoardContentButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                System.out.println("User clicked on quit");
+//                System.out.println("User clicked on quit");
                 ClientController.getClientController().quit();
             }
         });
@@ -207,7 +200,7 @@ public class WhiteBoardClientGUI {
         closeWhiteBoardButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                System.out.println("User clicked on close");
+//                System.out.println("User clicked on close");
                 ClientController.getClientController().close();
             }
         });
@@ -215,7 +208,7 @@ public class WhiteBoardClientGUI {
         kickButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                System.out.println("kick");
+//                System.out.println("kick");
                 String username = (String) userList.getSelectedValue();
                 ClientController.getClientController().kick(username);
             }
@@ -224,7 +217,7 @@ public class WhiteBoardClientGUI {
         createBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-                System.out.println("create white board");
+//                System.out.println("create white board");
                 ClientController.getClientController().createWhiteBoard();
             }
         });

@@ -10,9 +10,6 @@ public class ServerGUI {
     private JTextField managerName;
 
     private JButton closeButton;
-    public static void main(String[] args) {
-        new ServerGUI().frame.setVisible(true);
-    }
 
     public ServerGUI() {
         // Initialize the frame

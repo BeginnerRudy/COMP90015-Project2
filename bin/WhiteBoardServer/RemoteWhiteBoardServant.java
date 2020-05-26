@@ -5,14 +5,13 @@ import WhiteBoardClient.IRemoteClient;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static Utils.Util.getRadius;
+import static Utils.Util.serverPrinter;
 
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
     private ConcurrentHashMap<String, IRemoteClient> users = new ConcurrentHashMap<>(); // stores a hash map between username and its remote interface
@@ -26,10 +25,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 try {
                     this.close(manager, CloseType.SERVER_CLOSE);
                 } catch (RemoteException ex) {
-                    ex.printStackTrace();
+//                    ex.printStackTrace();
+                    serverPrinter("Error", "Server fail to close the white board. ");
                 }
             } else {
                 JOptionPane.showMessageDialog(this.serverGUI.frame, "There is no whiteboard!");
+                serverPrinter("Error", "There is no whiteboard for server to close.");
             }
         });
 
@@ -43,12 +44,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
 
-                if ( res == JOptionPane.YES_OPTION){
+                if (res == JOptionPane.YES_OPTION) {
                     if (manager != null) {
                         try {
                             close(manager, CloseType.SERVER_CLOSE);
                         } catch (RemoteException ex) {
-                            ex.printStackTrace();
+//                            ex.printStackTrace();
+                            serverPrinter("Error", "Server fail to close the white board. ");
                         }
                     }
                     new Thread(() -> {
@@ -57,7 +59,6 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                         System.exit(0);
                     }).start();
                 }
-
             }
         });
 
@@ -73,14 +74,17 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             if (manager == null) {
                 // this is the first user -> promote it to be the manager
                 users.put(username, remoteClient);
+                serverPrinter("Success", username + " has joined the white board. ");
+                serverPrinter("Success", username + " is the manager now.");
                 manager = username;
                 this.serverGUI.getManagerName().setText(username);
                 try {
                     remoteClient.setToBeManager();
                     remoteClient.say("You are the manger now");
                 } catch (RemoteException e) {
-                    e.printStackTrace();
-                    System.out.println("==Error= promote the first user to be the manager. ");
+//                    e.printStackTrace();
+                    serverPrinter("Error", "Fail to set the uer as the manager");
+//                    System.out.println("==Error= promote the first user to be the manager. ");
                 }
 
                 // send all user in the whiteboard
@@ -96,12 +100,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     // add new peer to
                     users.put(username, remoteClient);
                     this.broadcasting(username + " jas joined the board!", username);
-                    System.out.println(username);
+                    serverPrinter("Success", username + " has joined the white board. ");
                     try {
-
                         remoteClient.say("Joined successfully.");
                     } catch (RemoteException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
+                        serverPrinter("Error", "Failed to notify the " + username + " that it has joined the whiteboard. ");
                     }
                     // send all user in the whiteboard
                     broadcastingAddUser(username);
@@ -114,9 +118,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
                     try {
                         remoteClient.say("You are not allowed to join.");
+                        serverPrinter("Success", username + " has been refused to join the white board. ");
                     } catch (RemoteException e) {
-                        e.printStackTrace();
-                        System.out.println("==Error= name collision, failed to join");
+                        serverPrinter("Error", "Fail to notify the " + username + " has joined the white board. ");
+//                        e.printStackTrace();
+//                        System.out.println("==Error= name collision, failed to join");
                     }
                     return MessageType.REFUSED_JOIN;
                 }
@@ -126,10 +132,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             // name already exits ! Failed to join.
             try {
                 remoteClient.say("The name has already existed, please try another name. ");
+                serverPrinter("Success", username + " has already in the white board, not allowed to join. ");
                 return MessageType.DUPLICATE_NAME;
             } catch (RemoteException e) {
                 e.printStackTrace();
-                System.out.println("==Error= name collision, failed to join");
+                serverPrinter("Error", " Fail to notify the username is duplicated.");
+//                System.out.println("==Error= name collision, failed to join");
             }
 //            return Mes;
         }
@@ -142,7 +150,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         // notify all the other user in the board that the board has been closed.
         if (!username.equals(manager)) {
             users.get(username).say("You are not the manager !");
-            System.out.println(manager + username);
+            serverPrinter("Success", username + " tries to close the whiteboard but it is not the manager! ");
+//            System.out.println(manager + username);
             return false;
         }
 
@@ -153,6 +162,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.manager = null; // reset the manager
         this.serverGUI.getManagerName().setText("No manager");
         this.users.clear();
+
+        serverPrinter("Success", "Current whiteboard is closed.");
         return true;
     }
 
@@ -162,6 +173,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.users.remove(username);
         this.broadcastingRemoveUser(username);
         this.broadcasting(username + "has quited the board");
+        serverPrinter("Success", username + " has quited the white board. ");
         return true;
     }
 
@@ -175,6 +187,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     @Override
     public boolean kick(String username) throws RemoteException {
         this.users.get(username).say("you have been kicked");
+        serverPrinter("Success", username + " has been kicked out the whiteboard. ");
         this.users.get(username).closeGUI(CloseType.KICKED);
         this.users.remove(username);
         broadcastingRemoveUser(username);
@@ -183,11 +196,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     @Override
     public boolean transfer(String username) throws RemoteException {
-        System.out.println(username);
+//        System.out.println(username);
         if (this.users.get(username) != null) {
             this.users.get(username).becomeManager();
             this.manager = username;
             this.serverGUI.getManagerName().setText(username);
+            serverPrinter("Success", username + " has become the white board manager. ");
             return true;
         }
         return false;
@@ -195,6 +209,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     @Override
     public SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException {
+        serverPrinter("Success", " new canvas is initialized. ");
         this.canvas = canvas;
         broadcastingTheNewCanvas();
         return this.canvas;
@@ -209,7 +224,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     try {
                         this.users.get(username).createCanvas(this.canvas);
                     } catch (RemoteException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
+                        serverPrinter("Error", "Failed to create whiteboard for " + username);
                     }
                 }).start();
             }
@@ -223,7 +239,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 try {
                     remoteClient.addUser(username);
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    serverPrinter("Error", "Failed to update user list. ");
                 }
             }).start();
         }
@@ -235,7 +252,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 try {
                     remoteClient.removeUser(username);
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    serverPrinter("Error", "Failed to remove user from user list. ");
                 }
             }).start();
         }
@@ -254,7 +272,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     try {
                         remoteClient.closeGUI(closeType);
                     } catch (RemoteException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
+                        serverPrinter("Error", "Failed to close client");
                     }
                 }).start();
             }
@@ -265,7 +284,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     try {
                         remoteClient.closeGUI(closeType);
                     } catch (RemoteException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
+                        serverPrinter("Error", "Failed to close client");
                     }
                 }).start();
             }
@@ -274,6 +294,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.users.clear();
         this.manager = null;
         this.serverGUI.getManagerName().setText("No manager");
+        serverPrinter("Success", "The canvas has been removed.");
         this.canvas = null;
     }
 
@@ -283,7 +304,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 try {
                     remoteClient.say(message);
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    serverPrinter("Error", "Failed to send message to client by the say API.");
                 }
             }).start();
         }
@@ -296,7 +318,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     try {
                         users.get(user).say(message);
                     } catch (RemoteException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
+                        serverPrinter("Error", "Failed to send message to client by the say API.");
                     }
                 }).start();
             }
@@ -307,8 +330,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     /*===========================user remote drawing apis=============================*/
     @Override
     public synchronized void drawShape(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException {
-        System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
-        System.out.println(String.format("End: (%d, %d)", end.x, end.y));
+//        System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
+//        System.out.println(String.format("End: (%d, %d)", end.x, end.y));
         Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
         g.setColor(Color.BLACK);
         switch (mode) {
@@ -329,6 +352,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 start = pairOfPoints.start;
                 end = pairOfPoints.end;
                 g.drawOval(start.x, start.y, radius, radius);
+            case TEXT:
+                break;
             default:
                 System.out.println("not support");
         }
@@ -338,6 +363,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     this.users.get(user).drawShape(start, end, mode);
             }
         }
+        serverPrinter("Success",username+ " has drawn a shape.") ;
+
     }
 
     @Override
@@ -348,6 +375,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         for (String user : users.keySet()) {
             if (!user.equals(username)) {
                 this.users.get(user).drawString(start, c);
+                serverPrinter("Success",username+ " has input a text.") ;
+
             }
         }
     }

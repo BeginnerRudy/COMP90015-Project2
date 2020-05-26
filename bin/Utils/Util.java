@@ -52,4 +52,12 @@ public class Util {
         // TODO how to make the radius to cross both start and end
         return (int) Math.sqrt(Math.pow(Math.abs(start.x - end.x), 2) + Math.pow(Math.abs(start.x - end.x), 2));
     }
+
+    public static void serverPrinter(String type, String msg){
+        System.out.println(type + ": " +  msg);
+    }
+
+    public static void clientPrinter(String type, String msg){
+        System.out.println(type + ": " +  msg);
+    }
 }
