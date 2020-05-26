@@ -3,6 +3,7 @@ package WhiteBoardServer;
 import Utils.*;
 import WhiteBoardClient.IRemoteClient;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,11 +29,37 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     ex.printStackTrace();
                 }
             } else {
-                System.out.println("Exits");
+                JOptionPane.showMessageDialog(this.serverGUI.frame, "There is no whiteboard!");
             }
         });
 
         this.serverGUI.getManagerName().setText("No manager");
+        this.serverGUI.frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.serverGUI.frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                int res = JOptionPane.showConfirmDialog(serverGUI.frame,
+                        "Are you sure you want to close this whiteboard?", "Close Window?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+
+                if ( res == JOptionPane.YES_OPTION){
+                    if (manager != null) {
+                        try {
+                            close(manager, CloseType.SERVER_CLOSE);
+                        } catch (RemoteException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    new Thread(() -> {
+                        System.out.print("Shutting down...");
+                        System.out.println("done");
+                        System.exit(0);
+                    }).start();
+                }
+
+            }
+        });
 
 //        System.out.println("Closed");
     }

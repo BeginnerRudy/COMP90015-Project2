@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ServerGUI {
-    private JFrame frame;
+    public JFrame frame;
     private JPanel panel;
 
     private JTextField managerName;

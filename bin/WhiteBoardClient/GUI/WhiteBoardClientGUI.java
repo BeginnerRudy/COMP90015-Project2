@@ -160,18 +160,23 @@ public class WhiteBoardClientGUI {
         });
 
         m3.addActionListener(e -> {
-            System.out.println("Click on open");
+//            System.out.println("Click on open");
 
-            JFileChooser filePicker = new JFileChooser("./data");
-            filePicker.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            filePicker.showDialog(this.frame, "Select File");
+//            if (this.)
+            if (ClientController.getClientController().isClosedByServer()){
+                    JOptionPane.showMessageDialog(this.frame, "Invalid! The whiteboard has closed by server!");
+            }else {
+                JFileChooser filePicker = new JFileChooser("./data");
+                filePicker.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                filePicker.showDialog(this.frame, "Select File");
 
-            File file = filePicker.getSelectedFile();
-            if (file == null) {
-                System.out.println("no file selected");
-                return;
+                File file = filePicker.getSelectedFile();
+                if (file == null) {
+                    System.out.println("no file selected");
+                    return;
+                }
+                ClientController.getClientController().open(file);
             }
-            ClientController.getClientController().open(file);
         });
 
         // add menu items to menu
