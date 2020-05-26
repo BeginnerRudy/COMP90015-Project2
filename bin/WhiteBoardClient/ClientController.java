@@ -1,6 +1,7 @@
 package WhiteBoardClient;
 
 import Utils.*;
+import WhiteBoardClient.GUI.SelectFrame;
 import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
 import WhiteBoardClient.GUI.WhiteBoardClientGUI;
 import WhiteBoardServer.IRemoteWhiteBoard;
@@ -12,12 +13,14 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 
 import static Utils.Util.WHITEBOARD_HEIGHT;
 import static Utils.Util.WHITEBOARD_WIDTH;
@@ -62,6 +65,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     public boolean isClosedByServer() {
         return isClosedByServer;
     }
+
     public boolean isManager() {
         return isManager;
     }
@@ -177,9 +181,27 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+    @Override
+    public void becomeManager() throws RemoteException {
+        this.isManager = true;
+        System.out.println("be come manager");
+        this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(true);
+        this.whiteBoardClientGUI.kickButton.setVisible(true);
+        this.whiteBoardClientGUI.createBtn.setVisible(true);
+        this.whiteBoardClientGUI.mb.setVisible(true);
+        JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You are the manager now!");
+
+        this.whiteBoardLoginFrame.frame.dispose();
+        this.whiteBoardClientGUI.frame.setVisible(true);
+        this.whiteBoardClientGUI.frame.revalidate();
+        this.whiteBoardClientGUI.frame.validate();
+    }
+
     public void kick(String username) {
         if (this.isClosedByServer) {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
+        } else if (username == null) {
+            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Please select a user first!!");
         } else if (!username.equals(this.username)) {
             try {
                 this.remoteWhiteBoard.kick(username);
@@ -188,7 +210,57 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             }
         } else {
             // Manager cannot kick itself
-            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You cannot kick yourself!");
+            try {
+//                for (Iterator<Enumeration<String>> it = Arrays.asList(this.whiteBoardClientGUI.listModel.elements()).iterator(); it.hasNext(); ) {
+//                    Enumeration<String> user = it.next();
+//                    users.addElement(user);
+//                }
+//                this.whiteBoardClientGUI.listModel.removeElement(this.username);
+//                SelectFrame selectFrame = new SelectFrame((DefaultListModel) this.whiteBoardClientGUI.userList.getModel());
+//                JPopupMenu popup = new JPopupMenu();
+//                popup.add(this.whiteBoardClientGUI.userList);
+////                popup.show();
+//                popup.show(this.whiteBoardClientGUI.frame, 60, 60);
+
+                DefaultListModel listModel_2 = new DefaultListModel();
+                List<Object> users = Arrays.asList(this.whiteBoardClientGUI.listModel.toArray());
+                for (Object user : users) {
+                    if (!user.equals(this.username))
+                        listModel_2.addElement((String) user);
+                }
+
+                if (listModel_2.size() == 0) {
+                    JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Please click quit or close, since only you are in the room!");
+                }else {
+                    JList list = new JList(listModel_2);
+                    JOptionPane.showMessageDialog(
+                            this.whiteBoardClientGUI.frame, list, "Multi-Select Example", JOptionPane.PLAIN_MESSAGE);
+                    String newManager = (String) list.getSelectedValue();
+                    if (newManager != null){
+                        if (remoteWhiteBoard.transfer(newManager )) {
+                            this.isManager = false;
+                            this.whiteBoardClientGUI.closeWhiteBoardButton.setVisible(false);
+                            this.whiteBoardClientGUI.kickButton.setVisible(false);
+                            this.whiteBoardClientGUI.createBtn.setVisible(false);
+                            this.whiteBoardClientGUI.mb.setVisible(false);
+                            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "You are not the manager now!");
+
+                            this.whiteBoardLoginFrame.frame.dispose();
+                            this.whiteBoardClientGUI.frame.setVisible(true);
+                            this.whiteBoardClientGUI.frame.revalidate();
+                            this.whiteBoardClientGUI.frame.validate();
+                        } else {
+                            // deal with concurrency.
+                            JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The user is not in the room!");
+                        }
+                    }
+                    System.out.println(newManager);
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -217,8 +289,8 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 }
 
                 return true;
-            }else {
-                switch (res){
+            } else {
+                switch (res) {
                     case DUPLICATE_NAME:
                         JOptionPane.showMessageDialog(this.whiteBoardLoginFrame.frame, "The user name has already been taken!");
                         break;
@@ -257,11 +329,15 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     @Override
     public void addUser(String username) throws RemoteException {
         this.whiteBoardClientGUI.listModel.addElement(username);
+        this.whiteBoardClientGUI.frame.revalidate();
+        this.whiteBoardClientGUI.frame.revalidate();
     }
 
     @Override
     public void removeUser(String username) throws RemoteException {
         this.whiteBoardClientGUI.listModel.removeElement(username);
+        this.whiteBoardClientGUI.frame.revalidate();
+        this.whiteBoardClientGUI.frame.revalidate();
     }
 
     @Override
@@ -278,7 +354,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The manager has closed the whiteboard!");
             this.isClosed = true;
             // The whiteboard is closed, so no more action on the white board
-            if (this.whiteBoardClientGUI.canvas != null){
+            if (this.whiteBoardClientGUI.canvas != null) {
                 this.whiteBoardClientGUI.canvas.removeMouseListener(this);
                 this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
                 this.whiteBoardClientGUI.canvas.removeKeyListener(this);
@@ -287,7 +363,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
             this.isClosedByServer = true;
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "The SERVER has closed the whiteboard!");
             // The whiteboard is closed, so no more action on the white board
-            if (this.whiteBoardClientGUI.canvas != null){
+            if (this.whiteBoardClientGUI.canvas != null) {
                 this.whiteBoardClientGUI.canvas.removeMouseListener(this);
                 this.whiteBoardClientGUI.canvas.removeMouseMotionListener(this);
                 this.whiteBoardClientGUI.canvas.removeKeyListener(this);

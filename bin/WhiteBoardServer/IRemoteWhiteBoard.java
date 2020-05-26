@@ -15,6 +15,7 @@ public interface IRemoteWhiteBoard extends Remote {
     boolean quit(String username) throws RemoteException;
     boolean kick(String username) throws RemoteException;
     ArrayList<String> getUserList() throws RemoteException;
+    boolean transfer(String username) throws RemoteException;
 
     /*===========================user remote drawing apis=============================*/
     void drawShape(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException;

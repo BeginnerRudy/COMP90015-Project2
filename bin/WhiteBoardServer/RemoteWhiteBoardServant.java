@@ -21,13 +21,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     protected RemoteWhiteBoardServant() throws RemoteException {
         serverGUI.getCloseButton().addActionListener(e -> {
-            if (this.manager != null){
+            if (this.manager != null) {
                 try {
                     this.close(manager, CloseType.SERVER_CLOSE);
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
                 }
-            }else {
+            } else {
                 System.out.println("Exits");
             }
         });
@@ -151,6 +151,17 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     @Override
+    public boolean transfer(String username) throws RemoteException {
+        System.out.println(username);
+        if (this.users.get(username) != null) {
+            this.users.get(username).becomeManager();
+            this.manager = username;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException {
         this.canvas = canvas;
         broadcastingTheNewCanvas();
@@ -205,8 +216,8 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             this.broadcastingRemoveUser(username);
         }
 
-        if (closeType.equals(CloseType.SERVER_CLOSE)){
-            for (IRemoteClient remoteClient : users.values()){
+        if (closeType.equals(CloseType.SERVER_CLOSE)) {
+            for (IRemoteClient remoteClient : users.values()) {
                 new Thread(() -> {
                     try {
                         remoteClient.closeGUI(closeType);
@@ -215,9 +226,9 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                     }
                 }).start();
             }
-        }else if (closeType.equals(CloseType.MANAGER_CLOSE)){
+        } else if (closeType.equals(CloseType.MANAGER_CLOSE)) {
             this.users.remove(manager);
-            for (IRemoteClient remoteClient : users.values()){
+            for (IRemoteClient remoteClient : users.values()) {
                 new Thread(() -> {
                     try {
                         remoteClient.closeGUI(closeType);
