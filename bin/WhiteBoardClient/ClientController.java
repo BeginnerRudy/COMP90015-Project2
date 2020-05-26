@@ -1,7 +1,6 @@
 package WhiteBoardClient;
 
 import Utils.*;
-import WhiteBoardClient.GUI.SelectFrame;
 import WhiteBoardClient.GUI.WhiteBoardLoginFrame;
 import WhiteBoardClient.GUI.WhiteBoardClientGUI;
 import WhiteBoardServer.IRemoteWhiteBoard;
@@ -13,7 +12,6 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -234,7 +232,7 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
                 }else {
                     JList list = new JList(listModel_2);
                     JOptionPane.showMessageDialog(
-                            this.whiteBoardClientGUI.frame, list, "Multi-Select Example", JOptionPane.PLAIN_MESSAGE);
+                            this.whiteBoardClientGUI.frame, list, "Select New Manager", JOptionPane.PLAIN_MESSAGE);
                     String newManager = (String) list.getSelectedValue();
                     if (newManager != null){
                         if (remoteWhiteBoard.transfer(newManager )) {

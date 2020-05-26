@@ -32,7 +32,9 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
             }
         });
 
-        System.out.println("Closed");
+        this.serverGUI.getManagerName().setText("No manager");
+
+//        System.out.println("Closed");
     }
 
     /*==============================user management apis==============================*/
@@ -45,6 +47,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
                 // this is the first user -> promote it to be the manager
                 users.put(username, remoteClient);
                 manager = username;
+                this.serverGUI.getManagerName().setText(username);
                 try {
                     remoteClient.setToBeManager();
                     remoteClient.say("You are the manger now");
@@ -121,6 +124,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.broadcasting("The white board is closed now");
         this.broadcastingClose(closeType);
         this.manager = null; // reset the manager
+        this.serverGUI.getManagerName().setText("No manager");
         this.users.clear();
         return true;
     }
@@ -156,6 +160,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         if (this.users.get(username) != null) {
             this.users.get(username).becomeManager();
             this.manager = username;
+            this.serverGUI.getManagerName().setText(username);
             return true;
         }
         return false;
@@ -241,6 +246,7 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
         this.users.clear();
         this.manager = null;
+        this.serverGUI.getManagerName().setText("No manager");
         this.canvas = null;
     }
 
