@@ -51,6 +51,8 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     public void setMode(Mode mode) {
+        this.firstPoint = null;
+        this.lastPoint = null;
         this.mode = mode;
     }
 

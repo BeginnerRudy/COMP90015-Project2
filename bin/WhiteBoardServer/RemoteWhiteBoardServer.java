@@ -1,9 +1,12 @@
 package WhiteBoardServer;
 
+import Utils.Util;
 import org.apache.commons.cli.*;
 
+import java.net.BindException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
 
 /**
  * This class is responsible for start the server
@@ -28,14 +31,17 @@ public class RemoteWhiteBoardServer {
             Registry registry = LocateRegistry.createRegistry(port);
             IRemoteWhiteBoard remoteWhiteBoard = new RemoteWhiteBoardServant();
             registry.bind("WhiteBoard", remoteWhiteBoard);
-            System.out.println("White Board server ready! ");
+            Util.serverPrinter("Success", "White Board server ready! ");
+//            System.out.println("White Board server ready! ");
         } catch (ParseException e){
             formatter.printHelp("utility-name", options);
         } catch (NumberFormatException e){
-            System.out.println("Please enter integer for port");
-            e.printStackTrace();
-        }
-        catch (Exception e) {
+            Util.serverPrinter("Error", "Please enter integer for port");
+//            System.out.println();
+//            e.printStackTrace();
+        } catch (ExportException e){
+            Util.serverPrinter("Error", "Please choose another port since the port is already in use.");
+        }catch (Exception e) {
             e.printStackTrace();
         }
     }

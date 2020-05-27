@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Distributed-Whiteboard:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Distributed_Whiteboard_jar</output-path>
+    <root id="archive" name="Distributed-Whiteboard-Client.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/jarFiles/client/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="Distributed-Whiteboard" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../COMP90015 Distributed Systems Assignment 1/lib/commons-cli-1.4.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

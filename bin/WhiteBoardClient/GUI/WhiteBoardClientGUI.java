@@ -129,7 +129,6 @@ public class WhiteBoardClientGUI {
         });
 
         m2.addActionListener(e -> {
-            //TODO implement file type and check whether there is already a whiteboard
 
 //            System.out.println("Click on Save as");
             if (this.canvas != null) {

@@ -156,7 +156,6 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
      * @param canvas The file to open
      */
     public void open(File canvas) {
-        //TODO could the manger open or create more than one whiteboard at one time ?
         try {
             if (this.isClosedByServer) {
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
@@ -182,6 +181,13 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
     public void save() {
         if (this.whiteBoardClientGUI.canvas != null) {
             try {
+                String PATH = "./data";
+
+                File directory = new File(PATH);
+                if (! directory.exists()){
+                    directory.mkdir();
+                }
+
                 File outfile = new File("./data/Untitled" + ".png");
                 ImageIO.write(this.whiteBoardClientGUI.canvas.getWhiteBoard(), "png", outfile);
                 JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Saved as Untitled.png.");
@@ -356,7 +362,6 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
      */
     public boolean join(String username, String host, int port) {
         try {
-            // TODO host check
             Registry registry = LocateRegistry.getRegistry(host, port);
             IRemoteWhiteBoard remoteWhiteBoard = (IRemoteWhiteBoard) registry.lookup("WhiteBoard");
             this.remoteWhiteBoard = remoteWhiteBoard;
