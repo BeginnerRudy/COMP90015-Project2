@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * This class is responsible for the login GUI on the client side
+ */
 public class WhiteBoardLoginFrame {
     public JFrame frame;
     private JPanel panel;
@@ -89,7 +92,6 @@ public class WhiteBoardLoginFrame {
 
                 } else {
                     try {
-                        // TODO check host validity
                         portNum = Integer.parseInt(port.getText());
                         ClientController.getClientController().join(username.getText(), host.getText(), portNum);
                     } catch (Exception e) {

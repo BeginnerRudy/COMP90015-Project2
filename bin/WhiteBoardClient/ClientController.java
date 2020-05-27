@@ -22,19 +22,29 @@ import java.util.List;
 
 import static Utils.Util.*;
 
+/**
+ * This class is the major class who is responsible for the client input as well as interactive with the remote server.
+ */
 public class ClientController extends UnicastRemoteObject implements IRemoteClient, MouseListener, MouseMotionListener, KeyListener {
     private static ClientController clientController;
+    // The user name of the current user
     private String username;
 
+    // Whether the user is manager
     private boolean isManager = false;
+    // Whether the whiteboard is closed.
     private boolean isClosed = true;
 
+    // Whether the whiteboard is closed by the server
     private boolean isClosedByServer = false;
 
+    // Thu login GUI
     private WhiteBoardLoginFrame whiteBoardLoginFrame;
 
+    // The main control GUI
     private WhiteBoardClientGUI whiteBoardClientGUI = new WhiteBoardClientGUI();
 
+    // The remote interface of the server
     private IRemoteWhiteBoard remoteWhiteBoard;
 
     static {
@@ -53,6 +63,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         return clientController;
     }
 
+
+    /**
+     * This method would initialize the ClientController
+     * @param whiteBoardLoginFrame The login GUI
+     */
     public void init(WhiteBoardLoginFrame whiteBoardLoginFrame) {
         this.whiteBoardLoginFrame = whiteBoardLoginFrame;
     }
@@ -60,14 +75,25 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     /*========================================Advanced features========================================*/
 
+    /**
+     * @return True for closed by server, false for not
+     */
     public boolean isClosedByServer() {
         return isClosedByServer;
     }
 
+    /**
+     * @return True for is manager and false for not
+     */
     public boolean isManager() {
         return isManager;
     }
 
+    /**
+     * This method would save the file with provided name
+     *
+     * @param out The file to save
+     */
     public void saveAs(File out) {
         if (this.whiteBoardClientGUI.canvas != null) {
 
@@ -83,6 +109,12 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+    /**
+     * This method method is used to created the whiteboard for the client by the given canvas parameter.
+     *
+     * @param canvas This is the whiteboard object the server would send
+     * @throws RemoteException
+     */
     @Override
     public void createCanvas(SerializableBufferedImage canvas) throws RemoteException {
         if (this.isClosedByServer) {
@@ -95,6 +127,10 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+
+    /**
+     * This method is responsible for create a new blank whiteboard
+     */
     public void createWhiteBoard() {
         try {
             if (this.isClosedByServer) {
@@ -114,6 +150,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+    /**
+     * This method would open a canvas depends on the given canvas File.
+     *
+     * @param canvas The file to open
+     */
     public void open(File canvas) {
         //TODO could the manger open or create more than one whiteboard at one time ?
         try {
@@ -135,6 +176,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+    /**
+     * This mehtod would save the whiteboard
+     */
     public void save() {
         if (this.whiteBoardClientGUI.canvas != null) {
             try {
@@ -152,6 +196,10 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+
+    /**
+     * This method would close the application
+     */
     public void close() {
         try {
             if (this.isClosedByServer) {
@@ -171,6 +219,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
 
     /*========================================WhiteBoard Management========================================*/
+    /**
+     * This method would quit the user from the current whiteboard
+     */
     public void quit() {
         try {
             if (isManager && !this.isClosedByServer) {
@@ -196,6 +247,10 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+    /**
+     * This method would delegate this client to be manager of the system.
+     * @throws RemoteException
+     */
     @Override
     public void becomeManager() throws RemoteException {
         this.isManager = true;
@@ -212,6 +267,12 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         this.whiteBoardClientGUI.frame.validate();
     }
 
+
+    /**
+     * This method would ask the remote server to close the whiteboard
+     *
+     * @param username The username of user to be kciked out of the whitaboard
+     */
     public void kick(String username) {
         if (this.isClosedByServer) {
             JOptionPane.showMessageDialog(this.whiteBoardClientGUI.frame, "Invalid! The whiteboard has closed by server!");
@@ -285,6 +346,14 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     }
 
+
+    /**
+     * This method would try to join the user to the whiteboard by it given host, port and user name
+     * @param username The username provided by the user
+     * @param host The host ip
+     * @param port The port
+     * @return
+     */
     public boolean join(String username, String host, int port) {
         try {
             // TODO host check
@@ -334,12 +403,23 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         return false;
     }
 
+    /**
+     * This method is used for the server to print string on the server side
+     *
+     * @param msg The msg sent to the client
+     * @throws RemoteException
+     */
     @Override
     public void say(String msg) throws RemoteException {
         System.out.println(msg);
 
     }
 
+    /**
+     * This method is responsible for update the user list with all current users.
+     * @param user_names The usernames of all current users
+     * @throws RemoteException
+     */
     @Override
     public void updateUserList(ArrayList<String> user_names) throws RemoteException {
         // add it to the frame
@@ -349,6 +429,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }
     }
 
+    /**
+     * This method is responsible for add new user to the user list on the client side
+     * @param username The username of the new user
+     * @throws RemoteException
+     */
     @Override
     public void addUser(String username) throws RemoteException {
         this.whiteBoardClientGUI.listModel.addElement(username);
@@ -356,6 +441,11 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         this.whiteBoardClientGUI.frame.revalidate();
     }
 
+    /**
+     * This method is responsible for remove the given username
+     * @param username The username of the user who left the whiteboard
+     * @throws RemoteException
+     */
     @Override
     public void removeUser(String username) throws RemoteException {
         this.whiteBoardClientGUI.listModel.removeElement(username);
@@ -363,11 +453,21 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         this.whiteBoardClientGUI.frame.revalidate();
     }
 
+    /**
+     * This method set the user to be the manager by set its isManager fields to be true.
+     *
+     * @throws RemoteException
+     */
     @Override
     public void setToBeManager() throws RemoteException {
         this.isManager = true;
     }
 
+    /**
+     * This method is used to close the whiteboard
+     * @param closeType This indicates the close type of the close operation
+     * @throws RemoteException
+     */
     @Override
     public void closeGUI(CloseType closeType) throws RemoteException {
         if (closeType.equals(CloseType.KICKED)) {
@@ -399,6 +499,9 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
     }
 
+    /**
+     * This method would shut down the application
+     */
     private void closing() {
         new Thread(() -> {
             System.out.print("Shutting down...");
@@ -407,6 +510,13 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
         }).start();
     }
 
+    /**
+     * This method is used to ask the manager whether allow the user with given username to join.
+     *
+     * @param username The username of the user who wants to join in.
+     * @return true indicates the manager allows the join and false means join been refused
+     * @throws RemoteException
+     */
     @Override
     public boolean allowJoins(String username) throws RemoteException {
         int result = JOptionPane.showConfirmDialog(this.whiteBoardClientGUI.frame, username, "New user join request",
@@ -420,17 +530,37 @@ public class ClientController extends UnicastRemoteObject implements IRemoteClie
 
 
     /*========================================WhiteBoard Drawing========================================*/
+
+    /**
+     * This method would change the drawing mode of the whiteboard
+     *
+     * @param mode The mode to change to
+     */
     public void changeMode(Mode mode) {
         this.whiteBoardClientGUI.canvas.setMode(mode);
 //        System.out.println(mode);
     }
 
+    /**
+     * This method is used to draw character on to the remote client whiteboard on the given start point
+     *
+     * @param start The point for the char to start
+     * @param c The char to draw
+     * @throws RemoteException
+     */
     @Override
     public void drawString(MyPoint start, Character c) throws RemoteException {
         this.whiteBoardClientGUI.canvas.setRemoteDraw(true);
         this.whiteBoardClientGUI.canvas.drawString(start, c);
     }
 
+    /**
+     * This method is used to draw shape on the remote client
+     * @param start The start point of the shape
+     * @param end The end point of the shape
+     * @param mode The drawing mode
+     * @throws RemoteException
+     */
     @Override
     public void drawShape(MyPoint start, MyPoint end, Mode mode) throws RemoteException {
         this.whiteBoardClientGUI.canvas.requestFocusInWindow();

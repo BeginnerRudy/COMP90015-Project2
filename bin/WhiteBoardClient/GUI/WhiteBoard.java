@@ -8,21 +8,31 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
-
+/*
+* This class represents the whiteboard for the user to draw on.
+* */
 public class WhiteBoard extends JPanel implements Serializable {
+    // The current drawing mode of the whiteboard
     private Mode mode = Mode.LINE;
-
-
+    // The BufferedImage to draw on.
     private BufferedImage canvas;
 
+    // The remoteDraw indicates whether the drawing operation is sent by the remote server
     private boolean remoteDraw = false;
 
+    // These two are the two points used for drawing on the whiteboard
     public MyPoint lastPoint, firstPoint;
+
+    // This boolean value tells the whiteboard whether the drawing should be drawn on the whiteboard as a final draw.
     public boolean fixed = false;
     public WhiteBoard(int width, int length) {
         this.canvas = new BufferedImage(width, length, BufferedImage.TYPE_INT_ARGB);
     }
 
+    /*
+    * The constructor of BufferedImage
+    *
+    * */
     public WhiteBoard(BufferedImage canvas) {
         this.canvas = canvas;
     }
@@ -45,6 +55,15 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
     /*========================================Drawing features========================================*/
+
+    /**
+     * This method is responsible for drawing a line
+     *
+     * @param start The start point of the line
+     * @param end The end point of the line
+     * @param colour The colour of the line
+     * @param size The size of the line
+     */
     public void drawLine(MyPoint start, MyPoint end, Color colour, int size) {
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
@@ -75,6 +94,12 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
 
+    /**
+     * This method is responsible for drawing a rectangle
+     *
+     * @param start The first point on the diagonal of the rectangle
+     * @param end The second point on the diagonal of the rectangle
+     */
     public void drawRect(MyPoint start, MyPoint end) {
         this.requestFocusInWindow();
         Graphics2D g = (Graphics2D) this.canvas.getGraphics();
@@ -98,6 +123,12 @@ public class WhiteBoard extends JPanel implements Serializable {
     }
 
 
+    /**
+     * This method is responsible for drawing a circle
+     *
+     * @param start This is start point of the radius
+     * @param end The is the end point of the radius
+     */
     public void drawCircle(MyPoint start, MyPoint end) {
         Graphics2D g = (Graphics2D) canvas.getGraphics();
         Font f = new Font("Serif", Font.PLAIN, 12);
@@ -116,6 +147,11 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.repaint();
     }
 
+    /**
+     * This method is responsible for drawing character on the whiteboard
+     *
+     * @param c The char to draw
+     */
     public void drawString(Character c) {
         Graphics2D g = (Graphics2D) canvas.getGraphics();
         Font f = new Font("Serif", Font.PLAIN, 12);
@@ -134,6 +170,13 @@ public class WhiteBoard extends JPanel implements Serializable {
         this.repaint();
     }
 
+
+    /**
+     * This method is used to draw char on the given Point
+     *
+     * @param start The point to draw char
+     * @param c The char to draw
+     */
     public void drawString(MyPoint start, Character c) {
         Graphics2D g = (Graphics2D) canvas.getGraphics();
         Font f = new Font("Serif", Font.PLAIN, 12);

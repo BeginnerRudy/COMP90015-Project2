@@ -10,13 +10,16 @@ import java.io.File;
 import javax.swing.*;
 
 
+/**
+ * This class is responsible for the main Client GUI of the shared whiteboard
+ */
 public class WhiteBoardClientGUI {
 
     // Define GUI elements
     public JFrame frame;
-    private JLabel titleOfFrame;
     //    private Client client;
     private JPanel panel;
+    // Used as the scroll panel of the user list
     private JScrollPane scrollPaneForStatus;
     public JButton closeWhiteBoardButton;
     private JButton quitBoardContentButton;
@@ -24,12 +27,7 @@ public class WhiteBoardClientGUI {
     private JLabel userListTitle;
     public JList<String> userList;
     // ---------------------------------
-    private JTextPane chatPane;
-    // ---------------------------------
-    private Thread uploadImg;
-    private Thread downloadImg;
     public DefaultListModel<String> listModel;
-    BufferedImage getIma;
 
     public WhiteBoard canvas;
     //    WhiteBoardController whiteBoardController;
@@ -242,6 +240,11 @@ public class WhiteBoardClientGUI {
         });
     }
 
+    /**
+     * This method is used to create canvas, that is the place where the user goes to draw on.
+     *
+     * @param canvas  The BufferedImage to put on to the Whiteboard
+     */
     public void createCanvas(BufferedImage canvas) {
         //        Container contentPane = this.frame.getContentPane();
 //        JPanel c = new JPanel();

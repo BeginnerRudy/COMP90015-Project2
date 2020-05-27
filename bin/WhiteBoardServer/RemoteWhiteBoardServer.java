@@ -5,6 +5,9 @@ import org.apache.commons.cli.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * This class is responsible for start the server
+ */
 public class RemoteWhiteBoardServer {
     public static void main(String[] args) {
         // parser

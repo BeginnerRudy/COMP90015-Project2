@@ -3,6 +3,10 @@ package Utils;
 import java.awt.*;
 import java.io.Serializable;
 
+/*
+* This class is the Serializable version of the Point class
+*
+* */
 public class MyPoint implements Serializable {
     public int x;
     public int y;

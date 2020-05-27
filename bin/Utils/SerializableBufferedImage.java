@@ -5,6 +5,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
 
+/*
+* This class is the Serializable version of the BufferedImage class.
+*
+* */
 public class SerializableBufferedImage implements Serializable {
     private BufferedImage canvas;
 

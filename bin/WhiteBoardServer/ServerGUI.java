@@ -3,6 +3,9 @@ package WhiteBoardServer;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This class is the server side GUI, it includes one close button and one JTextFiled to show the current manager.
+ */
 public class ServerGUI {
     public JFrame frame;
     private JPanel panel;

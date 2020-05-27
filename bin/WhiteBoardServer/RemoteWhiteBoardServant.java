@@ -13,12 +13,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import static Utils.Util.getRadius;
 import static Utils.Util.serverPrinter;
 
+/**
+ * This class is responsible for the server side logic, it implements the IRemoteWhiteBoard interface.
+ * The client would communicate the server with this interface.
+ */
 public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRemoteWhiteBoard {
     private ConcurrentHashMap<String, IRemoteClient> users = new ConcurrentHashMap<>(); // stores a hash map between username and its remote interface
     private String manager; // The username of the manager
     private SerializableBufferedImage canvas; // This image stores the whiteboard image
     private ServerGUI serverGUI = new ServerGUI();
 
+    /**
+     * The constructor of the class.
+     *
+     * @throws RemoteException
+     */
     protected RemoteWhiteBoardServant() throws RemoteException {
         serverGUI.getCloseButton().addActionListener(e -> {
             if (this.manager != null) {
@@ -66,6 +75,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
     /*==============================user management apis==============================*/
+    /**
+     * This method handles the join request of the client
+     * @param username The username provided by the user
+     * @param remoteClient The remote interface of the client
+     * @return Whether success or not indicates by the MessageType
+     * @throws RemoteException
+     */
     @Override
     public synchronized MessageType join(String username, IRemoteClient remoteClient) throws RemoteException {
         // check if the name has been taken
@@ -144,6 +160,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return MessageType.UNKNOWN_FAILURE;
     }
 
+    /**
+     * This method is used to close the whiteboard
+     * @param username The username who wants to close the whiteboard
+     * @param closeType The closeType to define the semantics of the close operation
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public synchronized boolean close(String username, CloseType closeType) throws RemoteException {
 
@@ -167,6 +190,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return true;
     }
 
+    /**
+     * This method handles the quit requests of the user
+     *
+     * @param username The username of who wants to quit
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public synchronized boolean quit(String username) throws RemoteException {
         // notify all the other user in the board this user quits
@@ -177,6 +207,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return true;
     }
 
+    /**
+     * This method handles the request of asking for all the usernames.
+     * @return All the users' usernames in the current whiteboard
+     * @throws RemoteException
+     */
     @Override
     public ArrayList<String> getUserList() throws RemoteException {
         ArrayList<String> users_info = new ArrayList<>();
@@ -184,6 +219,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return users_info;
     }
 
+    /**
+     * This method handles the kick out requests from the manger
+     *
+     * @param username The username of the user to be kciked out
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public boolean kick(String username) throws RemoteException {
         this.users.get(username).say("you have been kicked");
@@ -194,6 +236,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return true;
     }
 
+    /**
+     * This method handles the transfer of ownership request
+     *
+     * @param username The username of who send this request
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public boolean transfer(String username) throws RemoteException {
 //        System.out.println(username);
@@ -207,6 +256,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         return false;
     }
 
+    /**
+     * This method is responsible for create a whiteboard on all the other clients excepts the manger.
+     * @param canvas The canvas sent by the manager
+     * @return
+     * @throws RemoteException
+     */
     @Override
     public SerializableBufferedImage create(SerializableBufferedImage canvas) throws RemoteException {
         serverPrinter("Success", " new canvas is initialized. ");
@@ -217,6 +272,9 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
 
     /*==============================broadcasting user management action ==============================*/
+    /**
+     * This method would concurrently create whiteboard for each client in the current whiteboard.
+     */
     private void broadcastingTheNewCanvas() {
         for (String username : users.keySet()) {
             if (!username.equals(manager)) {
@@ -233,6 +291,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
 
+    /**
+     * This method would add the username to all the clients in the whiteboard concurrently
+     *
+     * @param username The username to be add
+     */
     private void broadcastingAddUser(String username) {
         for (IRemoteClient remoteClient : users.values()) {
             new Thread(() -> {
@@ -246,6 +309,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         }
     }
 
+    /**
+     * This method would remove the username to all the clients in the whiteboard concurrently
+     *
+     * @param username The username to be remove
+     */
     private void broadcastingRemoveUser(String username) {
         for (IRemoteClient remoteClient : users.values()) {
             new Thread(() -> {
@@ -260,6 +328,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
     }
 
 
+    /**
+     * This method is responsible for close the whiteboard concurrently depends on the closeType passed in.
+     *
+     * @param closeType The closeType of this close operation
+     */
     private void broadcastingClose(CloseType closeType) {
         // remove all user from every user's user list
         for (String username : users.keySet()) {
@@ -298,6 +371,11 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         this.canvas = null;
     }
 
+    /**
+     * This method is used to broadcasting the message to all the users.
+     *
+     * @param message The message to send to each client
+     */
     private void broadcasting(String message) {
         for (IRemoteClient remoteClient : users.values()) {
             new Thread(() -> {
@@ -311,6 +389,12 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
         }
     }
 
+    /**
+     * This method is used for broadcasting message from one user to all the others.
+     *
+     * @param message The message to be broadcasting
+     * @param username The user who wants to broadcast the message.
+     */
     private void broadcasting(String message, String username) {
         for (String user : users.keySet()) {
             if (user != username) {
@@ -328,6 +412,14 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
 
     /*===========================user remote drawing apis=============================*/
+    /**
+     * This methods handles the broadcasting of the drawShape method
+     * @param username The username of who calls this RMI
+     * @param start The start point of the shape
+     * @param end The end point of the shape
+     * @param mode The drawing mode
+     * @throws RemoteException
+     */
     @Override
     public synchronized void drawShape(String username, MyPoint start, MyPoint end, Mode mode) throws RemoteException {
 //        System.out.println(String.format("Start: (%d, %d)", start.x, start.y));
@@ -367,6 +459,13 @@ public class RemoteWhiteBoardServant extends UnicastRemoteObject implements IRem
 
     }
 
+    /**
+     * This method handles the drawing string request from the clilent
+     * @param username The username of who sends this request
+     * @param start The start point of the character to draw
+     * @param c The char to draw
+     * @throws RemoteException
+     */
     @Override
     public void drawString(String username, MyPoint start, Character c) throws RemoteException {
         Graphics2D g = (Graphics2D) this.canvas.getWhiteBoard().getGraphics();
